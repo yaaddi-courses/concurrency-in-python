@@ -1,0 +1,54 @@
+name: Validate course
+
+# Slimmed per-course-repo version of the old monorepo's validate-courses.yml
+# — this repo IS one course now (no "*/foo" path-glob prefix needed, no
+# cross-course aggregation steps: those moved to the yaaddi-courses/
+# yaaddi-courses catalog repo's own scheduled rebuild-catalog.yml).
+on:
+  pull_request:
+    paths:
+      - "meta.json"
+      - "*.zip"
+      - "source/**"
+  push:
+    branches: [main]
+    paths:
+      - "meta.json"
+      - "*.zip"
+      - "source/**"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Validate this course
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # No target argument = this repo's own root, since a per-course repo
+      # has no sibling courses to scan (see ensure_course_ids.py's own
+      # doc comment for why a stable id matters).
+      - name: Auto-assign a course id, if missing
+        run: python ensure_course_ids.py
+
+      - name: Commit auto-assigned id, if any
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-assign course id"
+          file_pattern: "meta.json"
+
+      - name: Run validator
+        run: python validate_course.py . --source
