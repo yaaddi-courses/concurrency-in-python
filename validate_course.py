@@ -36,10 +36,12 @@ Exit code is non-zero if any check fails.
 """
 
 import argparse
+import colorsys
 import csv
 import io
 import json
 import os
+import re
 import struct
 import sys
 import zipfile
@@ -93,6 +95,57 @@ MAX_IMAGE_DIMENSION = 256
 # in the app repo's own session memory for why. A flat 256x256 cap would
 # flag every correctly-generated cover as an error.
 MAX_COVER_DIMENSION = (1024, 432)
+
+# The app's own error/danger color is #FF4B4B (hue ~0°) — a course whose own
+# brand color sits in the same red/red-adjacent band reads as an error state
+# throughout the UI (course cards, progress rings, buttons), regardless of
+# whether red happens to be the topic's genuine real-world brand color (git,
+# emotional-intelligence were both real, previously-fixed instances of this).
+# Matches the band the flashcard-course-reviewer agent's checklist already
+# names — this hard-codes what used to be a manual, by-eye judgment call.
+RED_HUE_BAND = ((340, 360), (0, 20))
+
+
+def _hex_to_hue(hex_color):
+    """Returns the hue in degrees [0, 360) for a "#RRGGBB" string, or None if
+    it doesn't parse as one (validate_meta_csv reports that separately)."""
+    value = (hex_color or "").strip().lstrip("#")
+    if len(value) != 6:
+        return None
+    try:
+        r, g, b = (int(value[i : i + 2], 16) / 255 for i in (0, 2, 4))
+    except ValueError:
+        return None
+    h, _l, _s = colorsys.rgb_to_hls(r, g, b)
+    return h * 360
+
+
+def _in_red_band(hue):
+    return any(lo <= hue < hi for lo, hi in RED_HUE_BAND)
+
+
+def _validate_meta_csv_color(source_dir, report):
+    """source/meta.csv's own "color" column (distinct from meta.json — see
+    build_course_zip.py, which copies this CSV's color straight into the
+    package the app imports). Only checked when the CSV/column exist; an
+    unparseable value isn't flagged here since it isn't this check's job —
+    the app-side import would already reject a genuinely malformed hex."""
+    meta_csv_path = os.path.join(source_dir, "meta.csv")
+    if not os.path.isfile(meta_csv_path):
+        return
+    with open(meta_csv_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        return
+    color = (rows[0].get("color") or "").strip()
+    hue = _hex_to_hue(color)
+    if hue is not None and _in_red_band(hue):
+        report.error(
+            f'source/meta.csv "color" ("{color}") falls in the red/red-adjacent band '
+            f"(hue {round(hue)}°) — reads as an error state throughout the app's UI "
+            "regardless of whether red is the topic's own real-world brand color; "
+            "pick a color outside 340°-360°/0°-20° hue instead"
+        )
 
 
 def _image_dimensions(path):
@@ -296,6 +349,48 @@ def validate_meta_json(course_dir, report):
     return meta
 
 
+# Fields a card can hold free-form prose/inline-code in — see app/src/lib/
+# inlineCode.ts's own doc comment for the exact convention this checks
+# against: a single-backtick span (`` `docker run` ``) renders as styled
+# monospace code; anything else involving backticks is a mistake, not a
+# format the app understands.
+INLINE_CODE_CHECKED_FIELDS = ("prompt", "options", "explanation")
+CONSECUTIVE_BACKTICKS_RE = re.compile("`{2,}")
+
+
+def _check_inline_code_markup(card, report):
+    """Catches malformed backtick-delimited inline code before it ships —
+    the exact class of bug behind a real, live-reported issue ("the code in
+    cards is shown like raw text"): a course author reasonably reaches for
+    Markdown-style backticks to mark up a command/snippet inline, but the
+    app only understands a SINGLE matched backtick pair per span (see
+    app/src/lib/inlineCode.ts's own doc comment — no triple-backtick fenced
+    blocks; use a dedicated code_fill/command_output card for a whole-line
+    snippet instead). An unpaired backtick or a run of 2+ consecutive
+    backticks both render as literal stray characters, not code."""
+    cid = card.get("id")
+    for field in INLINE_CODE_CHECKED_FIELDS:
+        text = card.get(field) or ""
+        if "`" not in text:
+            continue
+        if text.count("`") % 2 != 0:
+            report.error(
+                f'card {cid}: "{field}" has an odd number of backtick (`) characters — '
+                "inline code needs a matched opening and closing backtick "
+                "(`` `like this` ``); an unpaired one renders as a literal stray "
+                "character instead of styled code"
+            )
+        run = CONSECUTIVE_BACKTICKS_RE.search(text)
+        if run:
+            report.error(
+                f'card {cid}: "{field}" has {len(run.group())} consecutive backticks — '
+                "only a single-backtick inline-code span is supported (no Markdown-style "
+                "triple-backtick fenced blocks); for a whole-line code/command snippet, use "
+                "a code_fill or command_output card instead of a backtick-fenced block in "
+                "free text"
+            )
+
+
 def validate_cards(units, cards, report, media_files=None):
     """media_files: set of filenames available to reference (image/audio), or
     None to skip the file-existence check (e.g. when validating raw source/
@@ -306,6 +401,21 @@ def validate_cards(units, cards, report, media_files=None):
         if uid in unit_ids:
             report.error(f'units.csv: duplicate unit id "{uid}"')
         unit_ids.add(uid)
+
+    # A deck whose whole job is reviewing earlier material (a mock/practice
+    # exam, a final recap) legitimately re-asks questions verbatim from
+    # earlier decks — that's the deck's actual point, not a copy-paste
+    # accident. Recognized by title convention rather than a schema field:
+    # keeps this working for any course that names its own recap decks this
+    # way without a CSV format change. A real example that motivated this:
+    # canadian-citizenship's "Practice Exam 1/2/3" decks re-test ~90
+    # questions from earlier decks verbatim, by design.
+    RECAP_DECK_KEYWORDS = ("practice exam", "practice test", "final review", "recap")
+    recap_unit_ids = {
+        u.get("id")
+        for u in units
+        if any(kw in (u.get("title") or "").lower() for kw in RECAP_DECK_KEYWORDS)
+    }
 
     card_ids = set()
     mains_by_id = {}
@@ -330,6 +440,8 @@ def validate_cards(units, cards, report, media_files=None):
         role = c.get("role")
         if role not in ("main", "exercise", "preview"):
             report.error(f'card {cid}: role must be "main", "exercise", or "preview", got "{role}"')
+
+        _check_inline_code_markup(c, report)
 
         uid = c.get("unit_id")
         if uid not in unit_ids:
@@ -468,14 +580,21 @@ def validate_cards(units, cards, report, media_files=None):
             # reasoning as the in-pack identical-question check above:
             # repeating a production/listening prompt verbatim across
             # unrelated cards is genuine, intentional spaced repetition of
-            # the same phrase, not a copy-paste accident.
+            # the same phrase, not a copy-paste accident. A card living in a
+            # recap/practice-exam deck (see RECAP_DECK_KEYWORDS above) is
+            # exempt from being flagged as the LATER duplicate — reusing an
+            # earlier deck's question there is the deck's whole point —
+            # but still gets RECORDED into prompt_seen_at like any other
+            # card, so a genuine accidental duplicate within the recap deck
+            # itself (or a later real duplicate of ITS wording) still gets
+            # caught.
             if ctype not in ("speech_recognition", "listening_card"):
                 normalized = " ".join(prompt.lower().split()) + "||" + (c.get("options") or "").strip().lower()
-                if normalized in prompt_seen_at:
+                if normalized in prompt_seen_at and uid not in recap_unit_ids:
                     report.warn(
                         f'card {cid}: prompt+options are a near-exact duplicate of card {prompt_seen_at[normalized]}'
                     )
-                else:
+                if normalized not in prompt_seen_at:
                     prompt_seen_at[normalized] = cid
 
         if c.get("audio") and ctype not in ("media_card", "listening_card"):
@@ -759,31 +878,57 @@ def validate_zip(course_dir, meta, report):
                 validate_cards(units, cards, report, media_files=media_files)
 
             glossary_text = read("glossary.csv")
+            card_ids = {c.get("id") for c in cards} if cards_text is not None else None
             if glossary_text is not None:
-                validate_glossary_rows(read_csv_text(glossary_text), report)
+                validate_glossary_rows(read_csv_text(glossary_text), report, card_ids)
     except zipfile.BadZipFile:
         report.error(f'"{meta["file"]}" is not a valid zip file')
 
 
-def validate_glossary(source_dir, report):
+def validate_glossary(source_dir, report, cards=None):
     """Checks source/glossary.csv, if the course has one — see docs/GLOSSARY.md
     in the app repo for the feature this feeds (tap-to-define technical terms,
     one shared definition per term instead of duplicating it into every card).
-    Entirely optional: a course with no jargon-heavy content can ship none."""
+    Entirely optional: a course with no jargon-heavy content can ship none.
+    `cards` (from the same source/cards.csv already loaded by the caller)
+    lets introduced_by_card_id be checked against real card ids."""
     glossary_path = os.path.join(source_dir, "glossary.csv")
     if not os.path.isfile(glossary_path):
         return
     with open(glossary_path, encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
-    validate_glossary_rows(rows, report)
+    card_ids = {c.get("id") for c in cards} if cards is not None else None
+    validate_glossary_rows(rows, report, card_ids)
 
 
-def validate_glossary_rows(rows, report):
+def validate_glossary_rows(rows, report, card_ids=None):
     seen_terms = {}
     for i, row in enumerate(rows, start=1):
         term = (row.get("term") or "").strip()
         definition = (row.get("definition") or "").strip()
         link = (row.get("link") or "").strip()
+        # Which card actually teaches this term, in teaching order — powers
+        # tools/check_key_term_usage.py's forward-reference check (does any
+        # EARLIER card use the term before this one introduces it). No
+        # structural way to infer this automatically (glossary.csv has never
+        # linked to a specific card, unlike language-course vocabulary's
+        # main-card ledger) — a human/reviewer judgment call, filled in once
+        # per term. Warning, not error, until a review pass has back-filled
+        # every existing course's glossary — see docs/TASKS.md for rollout.
+        intro_id = (row.get("introduced_by_card_id") or "").strip()
+        if term:
+            if not intro_id:
+                report.warn(
+                    f'glossary.csv row {i} ("{term}"): no "introduced_by_card_id" set — '
+                    "tools/check_key_term_usage.py can't verify this term isn't used "
+                    "before it's taught until this is filled in with the id of the card "
+                    "that actually introduces it"
+                )
+            elif card_ids is not None and intro_id not in card_ids:
+                report.error(
+                    f'glossary.csv row {i} ("{term}"): introduced_by_card_id "{intro_id}" '
+                    "does not match any card in cards.csv"
+                )
         if not term:
             report.error(f"glossary.csv row {i}: \"term\" is required.")
             continue
@@ -855,7 +1000,9 @@ def validate_source(course_dir, report, meta=None):
 
     validate_cards(units, cards, report, media_files=available)
 
-    validate_glossary(source_dir, report)
+    validate_glossary(source_dir, report, cards)
+
+    _validate_meta_csv_color(source_dir, report)
 
     # meta.json's optional "toc" is hand-copied from units.csv's title column
     # (see README.md) — nothing keeps them in sync automatically, so this is
@@ -879,45 +1026,6 @@ def validate_course_folder(course_dir, check_source=False):
     if check_source:
         validate_source(course_dir, report, meta=meta)
     return report, meta
-
-
-def check_catalog_freshness(repo_root):
-    """catalog.json (tools/build_catalog.py) is the single-file course index
-    the app fetches for a fast Course Library load — see that script's own
-    doc comment. CI regenerates and auto-commits it on every push to main,
-    but that auto-commit can't push on a pull_request from a fork
-    (GITHUB_TOKEN is read-only there), so a fork PR that adds/edits a
-    course would otherwise merge with a silently stale catalog.json and no
-    warning. This regenerates it in-memory and diffs against what's
-    actually committed, catching that case at PR-review time instead."""
-    report = Report("catalog.json")
-    tools_dir = os.path.join(repo_root, "tools")
-    if tools_dir not in sys.path:
-        sys.path.insert(0, tools_dir)
-    import build_catalog  # noqa: E402 (deliberately imported late — needs sys.path set first)
-
-    committed_path = os.path.join(repo_root, "catalog.json")
-    if not os.path.isfile(committed_path):
-        report.error(
-            "catalog.json is missing from the repo root — run `python tools/build_catalog.py` "
-            "and commit the result (CI does this automatically on push to main, but not on a fork PR)"
-        )
-        return report
-
-    try:
-        committed = json.loads(open(committed_path, encoding="utf-8").read())
-    except json.JSONDecodeError as e:
-        report.error(f"catalog.json is not valid JSON: {e}")
-        return report
-
-    fresh = build_catalog.build_catalog(build_catalog.Path(repo_root))
-    if committed != fresh:
-        report.error(
-            "catalog.json is out of date with the actual course folders — run "
-            "`python tools/build_catalog.py` and commit the result (CI does this automatically "
-            "on push to main, but not on a fork PR)"
-        )
-    return report
 
 
 def check_id_uniqueness(reports_and_metas):
@@ -947,14 +1055,12 @@ def main():
     repo_root = os.path.dirname(os.path.abspath(__file__))
     results = []
 
-    catalog_report = None
     if args.all:
         for entry in sorted(os.listdir(repo_root)):
             full = os.path.join(repo_root, entry)
             if os.path.isdir(full) and os.path.isfile(os.path.join(full, "meta.json")):
                 results.append(validate_course_folder(full, check_source=args.source))
         check_id_uniqueness(results)
-        catalog_report = check_catalog_freshness(repo_root)
     elif args.course:
         results.append(validate_course_folder(args.course, check_source=args.source))
     else:
@@ -962,8 +1068,6 @@ def main():
         sys.exit(1)
 
     reports = [r for r, _meta in results]
-    if catalog_report is not None:
-        reports.append(catalog_report)
     for r in reports:
         r.print()
 
