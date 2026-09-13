@@ -479,6 +479,22 @@ def validate_cards(units, cards, report, media_files=None):
             # blanks in a longer passage — so this is a full exemption, not
             # a check on a different field.
             pass
+        elif ctype == "select_blank" and "\n" in prompt:
+            # select_blank renders as one inline flow — before-text, the
+            # tappable blank, then after-text — so the app's own import
+            # validation hard-rejects any embedded newline here (confirmed:
+            # a course with a multi-line "Complete: ...\ncode___here" prompt
+            # fails to import with "prompt cannot contain a newline — before/
+            # blank/after must stay one inline flow"). Unlike the generic
+            # newline exemption below (for types that legitimately show a
+            # multi-line code/command snippet), select_blank has no such
+            # multi-line rendering path, so this must be a hard error, not a
+            # pass-through.
+            report.error(
+                f"card {cid}: select_blank prompt contains a newline — it "
+                f"must be a single inline line (before-text ___ after-text), "
+                f"e.g. \"t.join(___=5) waits, but gives up after 5 seconds.\""
+            )
         elif "\n" in prompt:
             # A prompt with a literal embedded newline is a code/command
             # snippet (e.g. "What does this print?\nx = 1\nprint(x)"), never
