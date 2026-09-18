@@ -1,0 +1,19 @@
+# Per-course build tooling (the scripts/manifests that originally generated
+# this course's cards.csv or its narration audio) — dev-only, never read by
+# the app or validate_course.py at runtime. Keep locally, don't publish.
+source/build/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+
+# Local dev-tooling config/instructions — project-specific settings for
+# whatever coding assistant/IDE is in use, not part of the shipped course
+# content. Kept on disk (still fully functional locally), just never
+# committed.
+.claude/
