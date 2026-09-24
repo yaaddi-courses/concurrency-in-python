@@ -782,6 +782,70 @@ def validate_cards(units, cards, report, media_files=None):
                 f"consider rebalancing so no single type is over {round(100 * MAX_SINGLE_TYPE_SHARE)}%"
             )
 
+    # Two course-wide "is the correct answer guessable from a tell, not the
+    # content" checks, for the choice-list types whose options are genuinely
+    # parallel (see CHOICE_LIST_TYPES). The app shuffles display order fresh
+    # every time a card is shown (src/lib/shuffle.ts) — random per showing,
+    # not a fixed per-card seed — specifically so a learner can't memorize
+    # "the correct one is always first/last". These checks catch the two
+    # tells that survive shuffling: (1) the correct option is *authorably*
+    # the longest one unusually often (length correlates with correctness
+    # regardless of display order — a longer, more "complete-sounding"
+    # option reads as more likely correct even shuffled), and (2) the
+    # correct option is *authored* at a suspiciously non-random index —
+    # this doesn't leak to a shuffling learner, but it hurts anyone who
+    # reads raw cards.csv (a reviewer, or a card type that doesn't shuffle
+    # yet) and makes a lopsided ledger easy to spot-fix at the source.
+    MAX_LONGEST_CORRECT_SHARE = 0.40
+    MIN_SAMPLE_FOR_BALANCE_CHECK = 15
+    longest_correct = 0
+    first_correct = 0
+    balance_sample = 0
+    for c in cards:
+        ctype = c.get("type") or "multiple_choice"
+        if ctype not in CHOICE_LIST_TYPES:
+            continue
+        options_raw = (c.get("options") or "").strip()
+        option_list = [o for o in options_raw.split("|")] if options_raw else []
+        correct_raw = (c.get("correct_index") or "").strip()
+        if len(option_list) < 3 or not correct_raw:
+            continue
+        try:
+            correct_index = int(correct_raw.split("|", 1)[0])
+        except ValueError:
+            continue
+        if not 0 <= correct_index < len(option_list):
+            continue
+        balance_sample += 1
+        lengths = [len(o) for o in option_list]
+        if lengths[correct_index] == max(lengths) and lengths.count(max(lengths)) == 1:
+            longest_correct += 1
+        if correct_index == 0:
+            first_correct += 1
+    if balance_sample >= MIN_SAMPLE_FOR_BALANCE_CHECK:
+        longest_share = longest_correct / balance_sample
+        if longest_share > MAX_LONGEST_CORRECT_SHARE:
+            report.warn(
+                f"the correct option is the single longest one in {longest_correct}/"
+                f"{balance_sample} ({round(100 * longest_share)}%) of this course's choice-list "
+                f"cards — a learner can guess from length alone above chance "
+                f"(~{round(100 / 3.5)}% expected for 3-4 options); write distractors closer "
+                "in length to the correct option"
+            )
+        # An even authored spread across 4 positions is 25% each; this only
+        # flags a real skew, not "not exactly 25%" — most existing courses
+        # sit near 100% (correct_index always 0), which is exactly what
+        # this is meant to catch.
+        first_share = first_correct / balance_sample
+        if first_share > 0.40:
+            report.warn(
+                f"correct_index is 0 (the first option) in {first_correct}/{balance_sample} "
+                f"({round(100 * first_share)}%) of this course's choice-list cards — vary "
+                "which position the correct answer is authored at (display order is "
+                "shuffled at runtime, but a skewed source ledger is still worth fixing, "
+                "and any card type that doesn't shuffle depends on this directly)"
+            )
+
     # Typing (type_answer, numeric_answer, code_fill, command_output,
     # short_answer) is slower and more error-prone to grade than tapping —
     # capped at 10% of a course's cards so review stays quick (see
@@ -895,24 +959,41 @@ def validate_zip(course_dir, meta, report):
 
             glossary_text = read("glossary.csv")
             card_ids = {c.get("id") for c in cards} if cards_text is not None else None
-            if glossary_text is not None:
+            if glossary_text is None:
+                # Required for every course (see validate_glossary's doc
+                # comment) — checked here too since a plain `validate_course.py
+                # <course>` run (no --source) only looks at the built zip.
+                report.error(
+                    "glossary.csv not found inside the zip — every course must "
+                    "ship one (see flashcard-course-creator SKILL.md §2a)"
+                )
+            else:
                 validate_glossary_rows(read_csv_text(glossary_text), report, card_ids)
     except zipfile.BadZipFile:
         report.error(f'"{meta["file"]}" is not a valid zip file')
 
 
 def validate_glossary(source_dir, report, cards=None):
-    """Checks source/glossary.csv, if the course has one — see docs/GLOSSARY.md
-    in the app repo for the feature this feeds (tap-to-define technical terms,
-    one shared definition per term instead of duplicating it into every card).
-    Entirely optional: a course with no jargon-heavy content can ship none.
-    `cards` (from the same source/cards.csv already loaded by the caller)
-    lets introduced_by_card_id be checked against real card ids."""
+    """Checks source/glossary.csv — see docs/GLOSSARY.md in the app repo for
+    the feature this feeds (tap-to-define technical terms, one shared
+    definition per term instead of duplicating it into every card).
+    Required for every course, no exceptions (owner's rule, 2026-09-21,
+    flashcard-course-creator SKILL.md §2a) — a course judged to have no real
+    jargon still lists its core taught concepts/terms. `cards` (from the
+    same source/cards.csv already loaded by the caller) lets
+    introduced_by_card_id be checked against real card ids."""
     glossary_path = os.path.join(source_dir, "glossary.csv")
     if not os.path.isfile(glossary_path):
+        report.error(
+            "source/glossary.csv is missing — every course must ship one "
+            "(term,definition,link — one entry per taught concept/term; see "
+            "flashcard-course-creator SKILL.md §2a)"
+        )
         return
     with open(glossary_path, encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
+    if not rows:
+        report.error("source/glossary.csv exists but has no rows — add at least one term")
     card_ids = {c.get("id") for c in cards} if cards is not None else None
     validate_glossary_rows(rows, report, card_ids)
 
