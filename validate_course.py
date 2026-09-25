@@ -683,7 +683,7 @@ def validate_cards(units, cards, report, media_files=None):
     for mid in mains_by_id:
         n = exercise_count_by_main.get(mid, 0)
         # Strict per-pack rule: every main card needs a paired preview card
-        # and at least 5 practice cards (see the "pack" requirements in
+        # and at least 2 practice cards (see the "pack" requirements in
         # docs/CARD_AUTHORING.md) — this is a hard error, not a guideline.
         if mid not in previews_by_main:
             report.error(f"main card {mid} has no preview card — every pack needs exactly one")
@@ -692,8 +692,8 @@ def validate_cards(units, cards, report, media_files=None):
                 f"main card {mid} has {len(previews_by_main[mid])} preview cards "
                 f"({', '.join(previews_by_main[mid])}) — a pack needs exactly one"
             )
-        if n < 3:
-            report.error(f"main card {mid} has only {n} practice card(s) — a pack needs at least 3")
+        if n < 2:
+            report.error(f"main card {mid} has only {n} practice card(s) — a pack needs at least 2")
         # A soft variety nudge, not an error — 5+ practice cards all sharing
         # one type usually means a card type was picked out of habit rather
         # than fit; occasionally a topic genuinely only fits one type well,

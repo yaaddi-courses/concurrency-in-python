@@ -103,12 +103,12 @@
     "Producer-Consumer Pattern Architecture",
     "Queue Implementation Selection",
     "Queue Completion & Joining",
-    "Graceful Shutdown & Poison Pills",
     "Bounded Queues & Backpressure",
     "Common Concurrency Bugs",
     "Profiling Concurrent Code",
     "Asyncio Debug Mode",
     "Signal Handling & Graceful Teardown",
-    "Concurrency Selection Decision Tree"
+    "Concurrency Selection Decision Tree",
+    "Recap: Key Terms"
   ]
 }
