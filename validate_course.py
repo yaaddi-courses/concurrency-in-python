@@ -350,44 +350,52 @@ def validate_meta_json(course_dir, report):
 
 
 # Fields a card can hold free-form prose/inline-code in — see app/src/lib/
-# inlineCode.ts's own doc comment for the exact convention this checks
+# inlineCode.ts's own doc comment for the exact conventions this checks
 # against: a single-backtick span (`` `docker run` ``) renders as styled
-# monospace code; anything else involving backticks is a mistake, not a
-# format the app understands.
+# inline code, and a triple-backtick fenced block (```python ... ```) renders
+# as a multi-line colored code block; any other use of backticks is a mistake,
+# not a format the app understands.
 INLINE_CODE_CHECKED_FIELDS = ("prompt", "options", "explanation")
 CONSECUTIVE_BACKTICKS_RE = re.compile("`{2,}")
+FENCED_CODE_BLOCK_RE = re.compile(r"```(?:\w+)?\n?.*?```", re.DOTALL)
 
 
 def _check_inline_code_markup(card, report):
-    """Catches malformed backtick-delimited inline code before it ships —
-    the exact class of bug behind a real, live-reported issue ("the code in
-    cards is shown like raw text"): a course author reasonably reaches for
-    Markdown-style backticks to mark up a command/snippet inline, but the
-    app only understands a SINGLE matched backtick pair per span (see
-    app/src/lib/inlineCode.ts's own doc comment — no triple-backtick fenced
-    blocks; use a dedicated code_fill/command_output card for a whole-line
-    snippet instead). An unpaired backtick or a run of 2+ consecutive
-    backticks both render as literal stray characters, not code."""
+    """Catches malformed backtick-delimited code before it ships — the exact
+    class of bug behind a real, live-reported issue ("the code in cards is
+    shown like raw text"). Two forms are understood: a SINGLE matched backtick
+    pair per inline span, and a well-formed triple-backtick fenced block (its
+    own fences, and any bare backtick used as code inside it, are fine). An
+    unpaired fence, an unpaired backtick, or a stray run of 2+ backticks
+    outside a fenced block renders as literal stray characters, not code."""
     cid = card.get("id")
     for field in INLINE_CODE_CHECKED_FIELDS:
         text = card.get(field) or ""
         if "`" not in text:
             continue
-        if text.count("`") % 2 != 0:
+        fences = text.count("```")
+        if fences % 2 != 0:
+            report.error(
+                f'card {cid}: "{field}" has an unpaired ``` fence ({fences} occurrences, '
+                "expected an even number) — every opening fence needs a closing one"
+            )
+            continue
+        remainder = FENCED_CODE_BLOCK_RE.sub("", text)
+        if "`" not in remainder:
+            continue
+        if remainder.count("`") % 2 != 0:
             report.error(
                 f'card {cid}: "{field}" has an odd number of backtick (`) characters — '
                 "inline code needs a matched opening and closing backtick "
                 "(`` `like this` ``); an unpaired one renders as a literal stray "
                 "character instead of styled code"
             )
-        run = CONSECUTIVE_BACKTICKS_RE.search(text)
+        run = CONSECUTIVE_BACKTICKS_RE.search(remainder)
         if run:
             report.error(
-                f'card {cid}: "{field}" has {len(run.group())} consecutive backticks — '
-                "only a single-backtick inline-code span is supported (no Markdown-style "
-                "triple-backtick fenced blocks); for a whole-line code/command snippet, use "
-                "a code_fill or command_output card instead of a backtick-fenced block in "
-                "free text"
+                f'card {cid}: "{field}" has {len(run.group())} consecutive backticks outside a '
+                "fenced block — use a single-backtick inline span or a complete ```language "
+                "fenced block"
             )
 
 
