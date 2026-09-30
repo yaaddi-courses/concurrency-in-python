@@ -210,8 +210,31 @@ def _check_image_size(path, label, report, max_width=MAX_IMAGE_DIMENSION, max_he
         )
 
 
+def _split_options(raw):
+    """Splits an options cell on "|"; a backslash-escaped pipe (backslash then pipe) is a literal pipe
+    inside one option (same rule as the app's csvImport splitOptions)."""
+    if not raw:
+        return []
+    parts, current, i = [], "", 0
+    while i < len(raw):
+        if raw[i] == "\\" and raw[i + 1 : i + 2] == "|":
+            current += "|"
+            i += 2
+            continue
+        if raw[i] == "|":
+            parts.append(current)
+            current = ""
+        else:
+            current += raw[i]
+        i += 1
+    parts.append(current)
+    return parts
+
+
 def _word_count(text):
-    return len((text or "").split())
+    """Words a learner has to read. A `code span` is one unit however it is spaced
+    (adding the spaces a formatter wants must not make a card look wordy)."""
+    return len(re.sub(r"`[^`\n]+`", "X", text or "").split())
 
 
 def _slugify(text):
@@ -399,6 +422,30 @@ def _check_inline_code_markup(card, report):
             )
 
 
+# "Listen: What does X do?" - a leftover authoring label, not a task (see validate_cards).
+STRAY_LISTEN_PREFIX_RE = re.compile(r"^\s*listen\s*[:,\-–—]", re.IGNORECASE)
+
+
+def _check_importer_rules(c, ctype, cid, report):
+    """Rules the APP enforces at import, so a course that passes here also installs.
+
+    Found 2026-09-30: four published courses could not be imported at all (a
+    match_pairs option with no separator, a select_blank prompt with no blank)
+    and this validator had passed them.
+    """
+    if ctype == "match_pairs":
+        options = [o for o in _split_options((c.get("options") or "").strip()) if o.strip()]
+        if len(options) < 2:
+            report.error(f'card {cid}: match_pairs needs at least 2 pairs as "left↔right"')
+        for option in options:
+            if not any(sep in option for sep in ("↔", ":", "/", ",")):
+                report.error(
+                    f'card {cid}: match_pairs option "{option}" has no separator - write it as "left↔right"'
+                )
+    elif ctype == "select_blank" and "___" not in (c.get("prompt") or ""):
+        report.error(f'card {cid}: select_blank prompt must contain a "___" blank to fill in')
+
+
 def validate_cards(units, cards, report, media_files=None):
     """media_files: set of filenames available to reference (image/audio), or
     None to skip the file-existence check (e.g. when validating raw source/
@@ -450,12 +497,19 @@ def validate_cards(units, cards, report, media_files=None):
             report.error(f'card {cid}: role must be "main", "exercise", or "preview", got "{role}"')
 
         _check_inline_code_markup(c, report)
+        _check_importer_rules(c, ctype, cid, report)
 
         uid = c.get("unit_id")
         if uid not in unit_ids:
             report.error(f'card {cid}: unit_id "{uid}" does not match any row in units.csv')
 
         prompt = (c.get("prompt") or "").strip()
+        if ctype != "listening_card" and STRAY_LISTEN_PREFIX_RE.match(prompt):
+            report.error(
+                f'card {cid}: prompt starts with a "Listen:" instruction - the learner is not being asked '
+                "to listen for anything the question does not already say; drop the prefix (only a "
+                "listening_card, whose prompt is the audio itself, is a real listening task)"
+            )
         if not prompt and ctype != "listening_card":
             report.error(f"card {cid}: empty prompt")
         elif ctype == "preview_card":
@@ -472,7 +526,7 @@ def validate_cards(units, cards, report, media_files=None):
             # options[0] (see the CSV format doc comment near KNOWN_TYPES),
             # which is checked for length below instead.
             options_raw = (c.get("options") or "").strip()
-            option_list = [o for o in options_raw.split("|")] if options_raw else []
+            option_list = _split_options(options_raw)
             question = option_list[0] if option_list else ""
             if _word_count(question) >= MAX_PROMPT_WORDS:
                 report.error(
@@ -518,7 +572,7 @@ def validate_cards(units, cards, report, media_files=None):
             pass
         else:
             options_raw = (c.get("options") or "").strip()
-            option_list = [o for o in options_raw.split("|")] if options_raw else []
+            option_list = _split_options(options_raw)
             prompt_words = _word_count(prompt)
             option_word_counts = [_word_count(o) for o in option_list]
             total_words = prompt_words + sum(option_word_counts)
@@ -814,7 +868,7 @@ def validate_cards(units, cards, report, media_files=None):
         if ctype not in CHOICE_LIST_TYPES:
             continue
         options_raw = (c.get("options") or "").strip()
-        option_list = [o for o in options_raw.split("|")] if options_raw else []
+        option_list = _split_options(options_raw)
         correct_raw = (c.get("correct_index") or "").strip()
         if len(option_list) < 3 or not correct_raw:
             continue

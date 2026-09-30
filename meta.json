@@ -4,7 +4,7 @@
   "description": "Threading, multiprocessing, and asyncio — from the GIL to structured concurrency, start to finish.",
   "image": "cover.png",
   "file": "concurrency-in-python.zip",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "tags": [
     "python",
     "concurrency",
@@ -22,6 +22,11 @@
       "version": "1.0.1",
       "date": "2026-09-24",
       "notes": "Wrapped code, commands and file names in backticks so they render as code (409 card(s))."
+    },
+    {
+      "version": "1.0.2",
+      "date": "2026-09-30",
+      "notes": "Code mentioned inside question and answer text (commands, function calls, keywords such as for/None/True, file names, flags) is now marked as code, so it shows in the code font and colors."
     }
   ],
   "toc": [
