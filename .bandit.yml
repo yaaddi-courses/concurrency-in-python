@@ -1,0 +1,3 @@
+# Bandit config. Run: bandit -c .bandit.yml -r . -q   (CI runs exactly this)
+exclude_dirs:
+  - node_modules
