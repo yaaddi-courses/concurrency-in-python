@@ -45,7 +45,7 @@ jobs:
         run: python ensure_course_ids.py
 
       - name: Commit auto-assigned id, if any
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: auto-assign course id"
           file_pattern: "meta.json"
