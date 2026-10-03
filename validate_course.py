@@ -148,6 +148,51 @@ def _validate_meta_csv_color(source_dir, report):
         )
 
 
+EXAM_COLUMNS = ("exam_questions", "exam_minutes", "exam_pass_percent", "exam_types")
+EXAM_QUESTION_TYPES = ("multiple_choice", "true_false")
+
+
+def _validate_meta_csv_exam(source_dir, report):
+    """source/meta.csv's optional course-exam columns (the app's "Test yourself"
+    official format - app/src/lib/examConfig.ts): exam_questions, exam_minutes
+    and exam_pass_percent must be whole numbers and either all set or all
+    blank; exam_types (optional, "|"-separated) may only list multiple_choice
+    and true_false. The app rejects a bad block at import, so catch it here."""
+    meta_csv_path = os.path.join(source_dir, "meta.csv")
+    if not os.path.isfile(meta_csv_path):
+        return
+    with open(meta_csv_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        return
+    row = {c: (rows[0].get(c) or "").strip() for c in EXAM_COLUMNS}
+    if not any(row.values()):
+        return
+    for column, low, high in (
+        ("exam_questions", 1, 200),
+        ("exam_minutes", 1, 300),
+        ("exam_pass_percent", 1, 100),
+    ):
+        value = row[column]
+        if not value:
+            report.error(
+                f'source/meta.csv "{column}" is blank but another exam column is set - '
+                "exam_questions, exam_minutes and exam_pass_percent must all be set together"
+            )
+        elif not value.isdigit() or not low <= int(value) <= high:
+            report.error(
+                f'source/meta.csv "{column}" ("{value}") must be a whole number from {low} to {high}'
+            )
+    if row["exam_types"]:
+        for kind in row["exam_types"].split("|"):
+            if kind.strip() not in EXAM_QUESTION_TYPES:
+                report.error(
+                    f'source/meta.csv "exam_types" lists "{kind.strip()}" - only '
+                    + " and ".join(EXAM_QUESTION_TYPES)
+                    + ' are allowed, separated by "|"'
+                )
+
+
 def _image_dimensions(path):
     """Reads width/height straight from a PNG or JPEG header, no dependency
     beyond the standard library. Returns None if the file isn't a
@@ -1162,6 +1207,7 @@ def validate_source(course_dir, report, meta=None):
     validate_glossary(source_dir, report, cards)
 
     _validate_meta_csv_color(source_dir, report)
+    _validate_meta_csv_exam(source_dir, report)
 
     # meta.json's optional "toc" is hand-copied from units.csv's title column
     # (see README.md) — nothing keeps them in sync automatically, so this is
