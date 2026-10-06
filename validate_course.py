@@ -174,10 +174,12 @@ def _validate_meta_csv_exam(source_dir, report):
         ("exam_pass_percent", 1, 100),
     ):
         value = row[column]
+        if column == "exam_minutes" and not value:
+            continue  # blank = the real exam has no time limit
         if not value:
             report.error(
                 f'source/meta.csv "{column}" is blank but another exam column is set - '
-                "exam_questions, exam_minutes and exam_pass_percent must all be set together"
+                "exam_questions and exam_pass_percent must be set together (exam_minutes may be blank for an exam with no time limit)"
             )
         elif not value.isdigit() or not low <= int(value) <= high:
             report.error(
@@ -519,6 +521,7 @@ def validate_cards(units, cards, report, media_files=None):
 
     card_ids = set()
     mains_by_id = {}
+    exam_cards = []
     exercises = []
     previews = []
     units_with_cards = set()
@@ -538,8 +541,10 @@ def validate_cards(units, cards, report, media_files=None):
             report.error(f'card {cid}: unknown type "{ctype}"')
 
         role = c.get("role")
-        if role not in ("main", "exercise", "preview"):
-            report.error(f'card {cid}: role must be "main", "exercise", or "preview", got "{role}"')
+        if role not in ("main", "exercise", "preview", "exam"):
+            report.error(
+                f'card {cid}: role must be "main", "exercise", "preview", or "exam", got "{role}"'
+            )
 
         _check_inline_code_markup(c, report)
         _check_importer_rules(c, ctype, cid, report)
@@ -757,12 +762,28 @@ def validate_cards(units, cards, report, media_files=None):
             if not (c.get("related_main_id") or "").strip():
                 report.error(f"card {cid}: preview card has no related_main_id")
             previews.append(c)
+        elif role == "exam":
+            # Exam-only question: never in a lesson or in spaced repetition, so no linked main card,
+            # and only the types a course exam is built from.
+            if ctype not in ("multiple_choice", "true_false"):
+                report.error(f'exam card {cid}: type must be multiple_choice or true_false, got "{ctype}"')
+            if (c.get("related_main_id") or "").strip():
+                report.error(f"card {cid}: exam card must not have a related_main_id")
+            exam_cards.append(c)
 
         if media_files is not None:
             for col in ("image", "audio"):
                 fn = c.get(col)
                 if fn and fn not in media_files:
                     report.error(f'card {cid}: {col} "{fn}" is not in the archive')
+
+    # Exam bank size: about one exam question per two main cards, and at least 40, so the course
+    # can offer several different numbered exams (20 questions each).
+    wanted = max(40, len(mains_by_id) // 2)
+    if not exam_cards:
+        report.warn(f"no exam cards (role \"exam\") - write at least {wanted} so \"Test yourself\" has a real question bank")
+    elif len(exam_cards) < wanted:
+        report.warn(f"only {len(exam_cards)} exam cards - aim for at least {wanted} (1 per 2 main cards, minimum 40)")
 
     # Cross-reference exercises -> mains, and count coverage.
     exercise_count_by_main = {}
@@ -1161,6 +1182,29 @@ def validate_glossary_rows(rows, report, card_ids=None):
             )
 
 
+def validate_deck_images(units, images_dir, report, media_dir=None):
+    """Every deck needs its own cover: two decks must not share an image file or identical picture bytes.
+    Decks whose image file is missing are reported by the other image checks, not here."""
+    import hashlib
+
+    seen = {}
+    for u in units:
+        name = (u.get("image") or "").strip()
+        paths = [os.path.join(d, name) for d in (images_dir, media_dir) if d and name]
+        path = next((p for p in paths if os.path.isfile(p)), "")
+        if not path:
+            continue
+        with open(path, "rb") as fh:
+            key = hashlib.sha256(fh.read()).hexdigest()
+        if key in seen:
+            report.error(
+                f'decks "{seen[key]}" and "{u.get("title")}" use the same image ({name}) - '
+                "give every deck its own cover so learners can tell them apart"
+            )
+        else:
+            seen[key] = u.get("title")
+
+
 def validate_source(course_dir, report, meta=None):
     """Validates course-drafts/<name>/source/{units,cards}.csv directly, if present —
     lets you check your working CSVs before rebuilding the zip."""
@@ -1201,6 +1245,8 @@ def validate_source(course_dir, report, meta=None):
                         f"source/images/{os.path.relpath(os.path.join(root, fn), images_dir).replace(os.sep, '/')}",
                         report,
                     )
+
+    validate_deck_images(units, images_dir, report, media_dir)
 
     validate_cards(units, cards, report, media_files=available)
 

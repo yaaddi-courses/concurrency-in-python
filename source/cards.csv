@@ -962,3 +962,89 @@ asyncio.run(main())|hi",0,,,"The code prints 'hi' because while create_task sche
 1934,86,match_pairs,exercise,1931,Connect the terms to what they mean.,task_done↔Marks item finished|cProfile↔Function-call profiler|asyncio debug mode↔Extra diagnostics|SIGINT↔Ctrl+C signal,,,,Each term is paired with its plain-language meaning.
 1935,86,match_pairs,exercise,1931,Match the terms and meanings.,free-threaded Python↔GIL-free build|threading.Condition↔Lock with wait|executor.map↔Apply over inputs|asyncio.Task↔Scheduled coroutine,,,,Each term is paired with its plain-language meaning.
 1936,86,true_false,exercise,1931,cooperative multitasking means timeout one awaitable.,,false,,,No: cooperative multitasking means voluntary yielding.
+1937,1,multiple_choice,exam,,Concurrency is about managing tasks that overlap in:,Time|Memory|Space,0,,,Several tasks make progress over the same period.
+1938,1,multiple_choice,exam,,Parallelism means tasks literally run:,Never|At once|In turn,1,,,Concurrency only manages many things at once.
+1939,1,true_false,exam,,Concurrency always means tasks run on separate cores.,,false,,,That is parallelism; concurrency is about structure.
+1940,2,multiple_choice,exam,,I/O-bound programs are limited by:,Waiting|Arithmetic|Memory size,0,,,"They wait on disk, network or a database."
+1941,2,multiple_choice,exam,,CPU-bound programs are limited by:,Disk throughput|Processing power|Network latency,1,,,The CPU is constantly busy computing.
+1942,3,multiple_choice,exam,,The GIL allows how many running threads?,Two|All|One,2,,,It protects CPython's reference counting.
+1943,3,true_false,exam,,The GIL makes single-threaded code slower.,,false,,,It keeps single-threaded code fast and CPython's state simple.
+1944,4,multiple_choice,exam,,Threads release the GIL while:,Starting|Waiting|Computing,1,,,Another thread can run meanwhile.
+1945,46,multiple_choice,exam,,True CPU parallelism in Python needs separate:,Threads|Coroutines|Processes,2,,,The multiprocessing module provides them.
+1946,5,multiple_choice,exam,,Free-threaded Python is a build that runs without the:,GIL|Interpreter|Garbage collector,0,,,It allows threads to run in parallel.
+1947,6,multiple_choice,exam,,A thread is started with its `target` and the:,`.join()` flag|`.start()` call|`.run()` import,1,,,"Create the Thread object first, then call `.start()`."
+1948,6,multiple_choice,exam,,Which method checks whether a thread is running?,`.is_set()`|`.running()`|`.is_alive()`,2,,,It reports the thread's current status.
+1949,7,multiple_choice,exam,,`.join()` makes the caller wait until the thread:,Finishes|Starts again|Sleeps awhile,0,,,"Start all threads first, then join them."
+1950,10,multiple_choice,exam,,A daemon thread is stopped automatically when the:,Queue empties|Program exits|Lock opens,1,,,It suits background cleanup.
+1951,9,multiple_choice,exam,,Which gives the current thread?,`threading.get_thread()`|`threading.me()`|`threading.current_thread()`,2,,,It exposes `.name` and `.ident`.
+1952,26,multiple_choice,exam,,A thread cannot simply return a:,Value|Exception|Name,0,,,Put results on a thread-safe queue instead.
+1953,11,multiple_choice,exam,,A race condition depends on the:,Thread count|Run order|Data size,1,,,The outcome varies unpredictably.
+1954,11,multiple_choice,exam,,A critical section must run:,Very slowly|Twice over|Exclusively,2,,,Only one thread should be inside at a time.
+1955,12,multiple_choice,exam,,`threading.Lock` gives:,Mutual exclusion|Parallel execution|Shared memory,0,,,Only one thread holds it at a time.
+1956,12,multiple_choice,exam,,Using `with lock:` guarantees the lock is:,Created|Released|Reentrant,1,,,Even if an error happens inside the block.
+1957,13,multiple_choice,exam,,An RLock lets the same thread acquire a lock:,Never again|Once only|Repeatedly,2,,,It solves reentrancy problems.
+1958,14,multiple_choice,exam,,A deadlock is a circular:,Wait|Queue|Loop,0,,,Each thread holds a resource another needs.
+1959,14,multiple_choice,exam,,Lock ordering always takes locks in a:,Reverse order|Fixed order|Random order,1,,,That removes circular waits.
+1960,15,multiple_choice,exam,,An atomic operation is:,Parallelized|Optionally|Indivisible,2,,,No other thread can see it half-done.
+1961,15,true_false,exam,,`counter += 1` is safe across threads without a lock.,,false,,,"It is read, add, write, and a thread can run in between."
+1962,16,multiple_choice,exam,,A `threading.Event` is a simple:,Counter|Flag|Queue,1,,,One thread sets it and others wait for it.
+1963,17,multiple_choice,exam,,A Condition's `wait()` should be re-checked in a:,If statement|Try block|While loop,2,,,It may return without the condition being true.
+1964,18,multiple_choice,exam,,A Semaphore limits how many threads:,Run together|Share state|Exist longer,0,,,It keeps an internal counter.
+1965,26,multiple_choice,exam,,BoundedSemaphore raises an error on an extra:,Wait|Release|Acquire,1,,,The counter would exceed its starting value.
+1966,19,multiple_choice,exam,,`threading.Timer` runs a function after a:,Loop count|Join point|Delay,2,,,It runs exactly once.
+1967,20,multiple_choice,exam,,`threading.local()` gives each thread its own:,Private copy|Shared lock|Message queue,0,,,Attributes are not visible to other threads.
+1968,22,multiple_choice,exam,,A process is started with `Process` and:,`.spawn()`|`.start()`|`.fork()`,1,,,Use `.join()` to wait for it.
+1969,22,multiple_choice,exam,,Threads share memory; processes each have their:,Same memory|Lock|Own memory,2,,,Processes are isolated from each other.
+1970,22,multiple_choice,exam,,Copy-on-write shares memory pages until one:,Modifies|Reads only|Closes early,0,,,Then the changed page is copied.
+1971,23,multiple_choice,exam,,The fork start method makes a:,Thread pool|Duplicate process|Fresh interpreter,1,,,spawn starts a fresh interpreter instead.
+1972,24,multiple_choice,exam,,The spawn method needs the `__main__` guard because it:,Uses threads|Skips importing|Re-imports main,2,,,Without the guard children would start more processes.
+1973,25,multiple_choice,exam,,A process succeeded if its `.exitcode` is:,Zero|One|Negative,0,,,Check it after `join()`.
+1974,26,multiple_choice,exam,,`multiprocessing.Queue` is a safe buffer for:,Async scheduling|Process communication|Thread locking,1,,,It allows separate processes to exchange data.
+1975,44,multiple_choice,exam,,By default `get()` on an empty queue:,Returns None|Raises|Blocks,2,,,It waits forever for an item.
+1976,27,multiple_choice,exam,,`multiprocessing.Pipe()` gives a pair of:,Connected endpoints|Shared locks|Message queues,0,,,It is for direct two-party communication.
+1977,28,multiple_choice,exam,,`multiprocessing.Value` shares a single:,File handle|Primitive|List object,1,,,"An int or float, for example."
+1978,30,multiple_choice,exam,,`multiprocessing.Array` shares a fixed-size:,Dictionary|Set|Sequence,2,,,You can index it like a list.
+1979,30,multiple_choice,exam,,"`shared_memory` offers a raw, zero-copy:",Block|Queue|Proxy,0,,,Any process can attach to it by name.
+1980,30,multiple_choice,exam,,A Manager runs a separate:,Shared lock|Server process|Worker thread,1,,,Other processes use proxies to reach the real object.
+1981,31,multiple_choice,exam,,`multiprocessing.Lock` protects an external:,Local variables|Thread names|Shared resource,2,,,It works across processes.
+1982,32,multiple_choice,exam,,Multiprocessing RLock supports:,Recursion|Parallelism|Shared memory,0,,,The same owner can acquire it repeatedly.
+1983,33,multiple_choice,exam,,`multiprocessing.Semaphore` limits how many processes:,Import|Run a section|Exist,1,,,It throttles across processes.
+1984,34,multiple_choice,exam,,A Barrier blocks processes until enough have called:,`.join()`|`.start()`|`.wait()`,2,,,Then all of them continue together.
+1985,35,multiple_choice,exam,,A poison pill tells a worker to:,Stop|Retry|Sleep,0,,,It is a sentinel value placed on the queue.
+1986,46,multiple_choice,exam,,ThreadPoolExecutor manages reusable:,Coroutines|Worker threads|Child processes,1,,,It offers simple `submit()` and `map()` calls.
+1987,36,multiple_choice,exam,,ProcessPoolExecutor can achieve true:,Async scheduling|Thread safety|CPU parallelism,2,,,"It uses separate processes, so the GIL does not limit it."
+1988,52,multiple_choice,exam,,`executor.submit()` returns a:,Future|List|Thread,0,,,It schedules one call.
+1989,38,multiple_choice,exam,,A `with` block on an executor calls:,`join()`|`shutdown(wait=True)`|`cancel()`,1,,,All work finishes before the block ends.
+1990,39,multiple_choice,exam,,`max_workers` sets the maximum number of:,Tasks queued|Retries|Concurrent workers,2,,,Size it differently for CPU and I/O work.
+1991,52,multiple_choice,exam,,Submitting millions of tasks at once can exhaust:,Memory|CPU cores|Lock handles,0,,,Every Future is queued in memory.
+1992,52,multiple_choice,exam,,A Future is a promise of an eventual:,Thread|Result|Error code,1,,,`result()` blocks until it is ready.
+1993,42,multiple_choice,exam,,"If `result(timeout=5)` expires, the task:",Is cancelled|Restarts itself|Keeps running,2,,,Only the waiting gives up.
+1994,52,multiple_choice,exam,,`add_done_callback` runs a function when the future:,Completes|Starts|Cancels first,0,,,It runs automatically.
+1995,52,multiple_choice,exam,,`as_completed` yields each future as soon as it:,Queues up|Finishes|Starts running,1,,,Results arrive in completion order.
+1996,52,multiple_choice,exam,,`future.cancel()` succeeds only if the task has not:,Failed|Returned|Started,2,,,A running task cannot be cancelled.
+1997,46,multiple_choice,exam,,`async def` creates a:,Coroutine function|Worker thread|Child process,0,,,Calling it returns a coroutine object.
+1998,46,multiple_choice,exam,,`await` hands control back to the:,Interpreter|Event loop|Thread pool,1,,,Other coroutines can run meanwhile.
+1999,47,multiple_choice,exam,,Cooperative multitasking means tasks pause:,Forcibly|Unpredictably|Voluntarily,2,,,They yield at await points.
+2000,48,multiple_choice,exam,,"Inside a coroutine, which sleep is non-blocking?",`asyncio.sleep()`|`time.sleep()`|`os.sleep()`,0,,,It lets the event loop run other tasks.
+2001,49,multiple_choice,exam,,A long loop with no await causes event loop:,Cancellation|Starvation|Recovery,1,,,No other coroutine can run.
+2002,50,multiple_choice,exam,,Forgetting to await a coroutine gives a:,Deadlock error|Timeout error|RuntimeWarning,2,,,The coroutine was never awaited.
+2003,51,multiple_choice,exam,,`create_task()` schedules a coroutine to run:,Concurrently|Later on|Never again,0,,,Plain `await` runs it to completion first.
+2004,53,multiple_choice,exam,,`asyncio.gather` runs awaitables:,Backwards|Together|One by one,1,,,It collects their results.
+2005,54,multiple_choice,exam,,`as_completed` yields results in:,Submission order|Random order|Completion order,2,,,`gather` keeps input order.
+2006,55,multiple_choice,exam,,`task.cancel()` raises:,`CancelledError`|`TimeoutError`|`KeyError`,0,,,The cancellation is advisory.
+2007,56,multiple_choice,exam,,`asyncio.timeout(5)` raises `TimeoutError` if the block takes:,Twice|Too long|Too short,1,,,It is available from Python 3.11.
+2008,57,multiple_choice,exam,,A TaskGroup guarantees tasks finish before the block:,Starts|Awaits|Exits,2,,,That is structured concurrency.
+2009,58,multiple_choice,exam,,TaskGroup collects errors in an:,ExceptionGroup|ErrorList|FailureSet,0,,,PEP 654 introduced it along with `except*`.
+2010,60,multiple_choice,exam,,`asyncio.shield` protects an inner task from:,Errors|Cancellation|Timeouts,1,,,When the outer scope is cancelled.
+2011,61,multiple_choice,exam,,Async code needs `asyncio.Lock` because `threading.Lock` would:,Run faster|Be ignored|Block everything,2,,,Everything runs on a single thread.
+2012,62,multiple_choice,exam,,`asyncio.Semaphore(5)` allows at most how many coroutines?,Five|Fifty|One,0,,,It limits concurrency.
+2013,64,multiple_choice,exam,,`asyncio.Queue` has awaitable `put()` and:,`wait()`|`get()`|`join()`,1,,,A full or empty queue suspends instead of blocking.
+2014,70,multiple_choice,exam,,`open_connection()` creates a non-blocking:,Subprocess|Thread|TCP client connection,2,,,It returns a reader and a writer.
+2015,70,multiple_choice,exam,,`requests` blocks the event loop because it is:,Synchronous|Asynchronous|Parallel,0,,,Use an async HTTP client instead.
+2016,71,multiple_choice,exam,,`run_in_executor()` moves blocking code to a:,Socket|Pool|Coroutine,1,,,The event loop stays responsive.
+2017,72,multiple_choice,exam,,`asyncio.to_thread()` was added in Python:,3.5|3.14|3.9,2,,,It is a simpler way to offload to a thread.
+2018,74,multiple_choice,exam,,Async code is called from sync code using:,`asyncio.run()`|`await`|`gather()`,0,,,It manages the event loop for you.
+2019,76,multiple_choice,exam,,Producer-consumer decouples work using a shared:,Thread|Queue|Lock,1,,,Producers and consumers run at their own pace.
+2020,80,multiple_choice,exam,,A bounded queue at maxsize makes `put()`:,Fail silently|Drop items|Wait,2,,,That is backpressure on the producer.
+2021,81,multiple_choice,exam,,A deadlock freezes the system because tasks:,Wait forever|Crash|Finish early,0,,,Race conditions give wrong results instead.
+2022,85,multiple_choice,exam,,"Choosing a model, first ask: I/O-bound or:",Disk-bound|CPU-bound|Memory-bound,1,,,"That decides between threads, processes or asyncio."
