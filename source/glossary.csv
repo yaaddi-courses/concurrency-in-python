@@ -246,23 +246,23 @@ daemon threads,Background threads that Python does not wait for when the program
 main threads,The thread a Python program starts running in.,https://docs.python.org/3/library/threading.html#threading.main_thread,104
 race conditions,Bugs where the result depends on the unpredictable timing of threads touching shared data.,https://en.wikipedia.org/wiki/Race_condition,134
 deadlocking,Getting stuck because threads each wait forever for a lock another one holds.,https://en.wikipedia.org/wiki/Deadlock_(computer_science),164
-deadlocks,Situations where threads each wait forever for a lock another one holds.,https://en.wikipedia.org/wiki/Deadlock_(computer_science),164
+deadlocks,Situations where threads each wait forever for a lock another one holds.,https://en.wikipedia.org/wiki/Deadlock,164
 forking,"Starting a new process by copying the running one, as the fork start method does.",https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods,250
-forks,Child processes created by copying the running process.,https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods,250
+forks,Child processes created by copying the running process.,https://en.wikipedia.org/wiki/Fork_(system_call),250
 spawning,Starting a fresh Python process that re-imports the program instead of copying it.,https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods,250
-spawns,Starts a fresh child process rather than copying the parent.,https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods,250
+spawns,Starts a fresh child process rather than copying the parent.,https://en.wikipedia.org/wiki/Spawn_(computing),250
 proxies,Stand-in objects that pass method calls on to the real shared object held by a manager.,https://docs.python.org/3/library/multiprocessing.html#proxy-objects,334
 poison pills,Special marker values put on a queue to tell workers to stop.,https://en.wikipedia.org/wiki/Sentinel_value,382
 graceful-shutdown,Stopping a program by letting running work finish and resources close cleanly.,https://en.wikipedia.org/wiki/Graceful_exit,388
 Future objects,Objects that hold the eventual result or error of work running in the background.,https://docs.python.org/3/library/concurrent.futures.html#future-objects,394
-coroutines,Functions defined with async def that can pause at await and resume later.,https://docs.python.org/3/library/asyncio-task.html#coroutines,484
+coroutines,Functions defined with async def that can pause at await and resume later.,https://docs.python.org/3/glossary.html#term-coroutine,484
 awaiting,Pausing a coroutine until another awaitable finishes so the event loop can run other work.,https://docs.python.org/3/library/asyncio-task.html#awaitables,490
-awaits,Pauses a coroutine until another awaitable finishes.,https://docs.python.org/3/library/asyncio-task.html#awaitables,490
-Transports,Low-level asyncio objects that move raw bytes over a connection.,https://docs.python.org/3/library/asyncio-protocol.html#transports,652
-Protocols,Low-level asyncio callback classes that react to data arriving on a transport.,https://docs.python.org/3/library/asyncio-protocol.html#protocols,35
+awaits,Pauses a coroutine until another awaitable finishes.,https://en.wikipedia.org/wiki/Async/await,490
+Transports,Low-level asyncio objects that move raw bytes over a connection.,https://docs.python.org/3/library/asyncio-protocol.html#asyncio.Transport,652
+Protocols,Low-level asyncio callback classes that react to data arriving on a transport.,https://docs.python.org/3/library/asyncio-protocol.html#asyncio.Protocol,35
 Threading,"Running several threads inside one process so tasks overlap, especially while waiting on input or output.",https://docs.python.org/3/library/threading.html,15
-Threads,Separate streams of execution that share one process's memory.,https://en.wikipedia.org/wiki/Thread_(computing),15
+Threads,Separate streams of execution that share one process's memory.,https://docs.python.org/3/library/threading.html#threading.Thread,15
 Locking,Using a lock so only one thread can touch shared data at a time.,https://docs.python.org/3/library/threading.html#lock-objects,8
-Locks,"Objects that let only one thread hold them at a time, protecting shared data.",https://docs.python.org/3/library/threading.html#lock-objects,8
-Events,Threading objects that let one thread signal others that something happened.,https://docs.python.org/3/library/threading.html#event-objects,15
-Queues,"First-in, first-out containers that safely pass items between threads or processes.",https://docs.python.org/3/library/queue.html,122
+Locks,"Objects that let only one thread hold them at a time, protecting shared data.",https://docs.python.org/3/library/threading.html#threading.Lock,8
+Events,Threading objects that let one thread signal others that something happened.,https://docs.python.org/3/library/threading.html#threading.Event,15
+Queues,"First-in, first-out containers that safely pass items between threads or processes.",https://docs.python.org/3/library/queue.html#queue.Queue,122
