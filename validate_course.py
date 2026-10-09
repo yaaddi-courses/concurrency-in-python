@@ -51,8 +51,10 @@ KNOWN_TYPES = {
     "match_pairs", "image_choice", "type_answer", "code_fill", "media_card",
     "image_occlusion", "numeric_answer", "command_output", "short_answer",
     "preview_card", "categorize", "spot_error", "listening_card",
-    "speech_recognition", "reading_passage", "cloze_passage",
+    "reading_passage", "cloze_passage",
 }
+# `speech_recognition` (say-it-aloud, microphone) cards were removed from the app on 2026-10-08, so a course that
+# still has one is unknown to KNOWN_TYPES and fails here instead of failing to import in the app.
 
 # Typing is slower and more error-prone than tapping, so courses are
 # expected to keep it rare — must match `requiresTyping` in the app's own
@@ -704,9 +706,9 @@ def validate_cards(units, cards, report, media_files=None):
             # prompt across many cards whose real content lives in
             # `options` — comparing prompt alone flagged dozens of false
             # positives on real courses before this was caught.
-            # speech_recognition/listening_card are exempt here too, same
+            # listening_card is exempt here too, same
             # reasoning as the in-pack identical-question check above:
-            # repeating a production/listening prompt verbatim across
+            # repeating a listening prompt verbatim across
             # unrelated cards is genuine, intentional spaced repetition of
             # the same phrase, not a copy-paste accident. A card living in a
             # recap/practice-exam deck (see RECAP_DECK_KEYWORDS above) is
@@ -716,7 +718,7 @@ def validate_cards(units, cards, report, media_files=None):
             # card, so a genuine accidental duplicate within the recap deck
             # itself (or a later real duplicate of ITS wording) still gets
             # caught.
-            if ctype not in ("speech_recognition", "listening_card"):
+            if ctype != "listening_card":
                 normalized = " ".join(prompt.lower().split()) + "||" + (c.get("options") or "").strip().lower()
                 if normalized in prompt_seen_at and uid not in recap_unit_ids:
                     report.warn(
@@ -838,9 +840,9 @@ def validate_cards(units, cards, report, media_files=None):
         # identical question twice with only the wrong-answer set changed
         # (e.g. "Hello یعنی چی؟" three times, each with different
         # distractors) isn't a different angle, it's the same test with
-        # cosmetic variation. Repetition of a *production* prompt
-        # (speech_recognition/listening_card — genuinely re-saying/re-
-        # hearing the same phrase) is fine and excluded here, as are
+        # cosmetic variation. Repetition of a listening prompt
+        # (listening_card — genuinely re-hearing the same phrase) is
+        # fine and excluded here, as are
         # reading_passage and cloze_passage: their "prompt" is the shared
         # passage text itself — several genuinely different comprehension
         # questions (or different blank sets) about the same passage are
@@ -859,7 +861,7 @@ def validate_cards(units, cards, report, media_files=None):
             if c.get("id") not in pack_ids:
                 continue
             ctype = c.get("type") or "multiple_choice"
-            if ctype in ("speech_recognition", "listening_card", "reading_passage", "cloze_passage"):
+            if ctype in ("listening_card", "reading_passage", "cloze_passage"):
                 continue
             prompt = (c.get("prompt") or "").strip()
             if not prompt:
