@@ -28,7 +28,7 @@ flush_sync,,,649,649
 sync_entry(),,,692,692
 async_work(),,,692,692
 run_forever,,,765,765
-Pipes,A multiprocessing function that creates a two-way connection between two processes.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Pipe,289,248
+Pipes,A multiprocessing function that creates a two-way connection between two processes.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Pipe,289,244|248
 Values,A multiprocessing object that stores one shared value in memory that several processes can use.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value,289,235|1834|520|542
 Managers,A multiprocessing server process that holds shared objects and hands out proxies to them.,https://docs.python.org/3/library/multiprocessing.html#managers,289,155|603|761
 Futures,An object that stands for a result that is not ready yet.,https://docs.python.org/3/library/asyncio-future.html,535,19|127|397|438|441|454|470|474|1860|687|737|742

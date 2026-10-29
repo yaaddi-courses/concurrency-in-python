@@ -4,7 +4,7 @@
   "description": "Threading, multiprocessing, and asyncio — from the GIL to structured concurrency, start to finish.",
   "image": "cover.png",
   "file": "concurrency-in-python.zip",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "tags": [
     "python",
     "concurrency",
@@ -32,6 +32,11 @@
       "version": "1.1.1",
       "date": "2026-10-29",
       "notes": "Cards: fill-in-the-blank code fragments no longer use code formatting around the blank, so they are not mistaken for unknown terms."
+    },
+    {
+      "version": "1.1.2",
+      "date": "2026-10-29",
+      "notes": "Cards: review fixes. Practice and pack cards now cover their planned keywords, and a few prompts, options and explanations no longer use terms taught later."
     }
   ],
   "toc": [
