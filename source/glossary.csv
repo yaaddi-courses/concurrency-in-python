@@ -266,3 +266,32 @@ Locking,Using a lock so only one thread can touch shared data at a time.,https:/
 Locks,"Objects that let only one thread hold them at a time, protecting shared data.",https://docs.python.org/3/library/threading.html#threading.Lock,8,locks-and-context-managers#lock
 Events,Threading objects that let one thread signal others that something happened.,https://docs.python.org/3/library/threading.html#threading.Event,15,events-between-threads#event
 Queues,"First-in, first-out containers that safely pass items between threads or processes.",https://docs.python.org/3/library/queue.html#queue.Queue,122,thread-info-and-queues#queue
+.begin(),"Not a Thread method; a thread is started with start(), which then calls run().",https://docs.python.org/3/library/threading.html,74,lookalike-thread-methods#begin
+.execute(),"Not a Thread method; start() begins a thread, and execute() belongs to other libraries.",https://docs.python.org/3/library/threading.html,74,lookalike-thread-methods#execute
+.status(),Not a Thread method; is_alive() reports whether a thread is still running.,https://docs.python.org/3/library/threading.html,81,lookalike-thread-methods#status
+.unlock(),"Not a Lock method; a Lock is released with release(), or by leaving a with block.",https://docs.python.org/3/library/threading.html,148,lookalike-thread-methods#unlock
+critical_work(),A placeholder name for the code that must run while a lock is held.,https://docs.python.org/3/library/threading.html,154,placeholder-names-in-examples#critical-work
+.off(),Not an Event method; clear() resets an Event's flag back to false.,https://docs.python.org/3/library/threading.html,190,lookalike-thread-methods#off
+state_changed(),A placeholder name for code that changes the state a Condition protects.,https://docs.python.org/3/library/threading.html,204,placeholder-names-in-examples#state-changed
+.decrement(),Not a Semaphore method; acquire() lowers the counter and waits at zero.,https://docs.python.org/3/library/threading.html,210,lookalike-thread-methods#decrement
+.take(),Not a Semaphore method; acquire() lowers the counter and waits at zero.,https://docs.python.org/3/library/threading.html,210,lookalike-thread-methods#take
+.abort(),Not a Timer method; cancel() stops a Timer before it fires.,https://docs.python.org/3/library/threading.html,222,lookalike-thread-methods#abort
+process(),Not a way to start work; a Process object is created and then started with start().,https://docs.python.org/3/library/multiprocessing.html,232,placeholder-names-in-examples#process
+my_func,A placeholder name for the function a Process or Thread runs as its target.,https://docs.python.org/3/library/multiprocessing.html,73,placeholder-names-in-examples#my-func
+.push(),Not a Queue method; a Queue adds items with put() and removes them with get().,https://docs.python.org/3/library/queue.html,288,lookalike-queue-and-pipe-methods#push
+.receive(),Not a Queue or Pipe method; a Pipe uses recv() and a Queue uses get().,https://docs.python.org/3/library/queue.html,288,lookalike-queue-and-pipe-methods#receive
+q.peek(),Not a Queue method; get_nowait() takes an item or raises Empty at once.,https://docs.python.org/3/library/queue.html,294,lookalike-queue-and-pipe-methods#peek
+.read_all(),Not a Pipe method; a Pipe connection reads one object at a time with recv().,https://docs.python.org/3/library/multiprocessing.html,300,lookalike-queue-and-pipe-methods#read-all
+counter.get_lock(),"Returns the lock that guards a shared Value, used in a with block to update it safely.",https://docs.python.org/3/library/multiprocessing.html,313,placeholder-names-in-examples#get-lock
+.flush(),Not a way to change a shared value; the value is updated inside the lock.,https://docs.python.org/3/library/multiprocessing.html,344,lookalike-queue-and-pipe-methods#flush
+.commit(),"Not a way to change a shared value; a database uses commit(), a shared Value does not.",https://docs.python.org/3/library/multiprocessing.html,344,lookalike-queue-and-pipe-methods#commit
+pool_size,Not a pool argument; ThreadPoolExecutor sets its thread limit with max_workers.,https://docs.python.org/3/library/concurrent.futures.html,427,lookalike-pool-and-asyncio-names#pool-size
+.check(),Not a Future method; done() tests a Future without waiting for the result.,https://docs.python.org/3/library/concurrent.futures.html,444,lookalike-queue-and-pipe-methods#check
+ProcessPool,"A shortened name for ProcessPoolExecutor, the executor that runs work in separate processes.",https://docs.python.org/3/library/concurrent.futures.html,450,lookalike-pool-and-asyncio-names#process-pool
+ExpiredError,Not a real exception; result(timeout=...) raises TimeoutError when the time is up.,https://docs.python.org/3/library/concurrent.futures.html,458,lookalike-pool-and-asyncio-names#expired-error
+NONE_COMPLETED,"Not an asyncio constant; wait() accepts FIRST_COMPLETED, FIRST_EXCEPTION and ALL_COMPLETED.",https://docs.python.org/3/library/asyncio-task.html,583,lookalike-pool-and-asyncio-names#none-completed
+save_critical_data(),A placeholder name for a coroutine that must finish even if the caller is cancelled.,https://docs.python.org/3/library/asyncio-task.html,589,placeholder-names-in-examples#save-critical-data
+flush_sync,Not a StreamWriter method; drain() waits until the write buffer has room again.,https://docs.python.org/3/library/asyncio-stream.html,649,lookalike-pool-and-asyncio-names#flush-sync
+sync_entry(),A placeholder name for an ordinary function that starts the event loop with asyncio.run().,https://docs.python.org/3/library/asyncio-runner.html,692,placeholder-names-in-examples#sync-entry
+async_work(),A placeholder name for a coroutine function that does the real asynchronous work.,https://docs.python.org/3/library/asyncio-runner.html,692,placeholder-names-in-examples#async-work
+run_forever,Not the way to register a signal handler; add_signal_handler() does that on the loop.,https://docs.python.org/3/library/asyncio-eventloop.html,765,lookalike-pool-and-asyncio-names#run-forever

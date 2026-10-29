@@ -1,33 +1,4 @@
 term,definition,link,introduced_by_card_id,found_in
-.begin(),,,74,74
-.execute(),,,74,74
-.status(),,,81,81
-.unlock(),,,148,148
-critical_work(),,,154,154|155
-.off(),,,190,190
-state_changed(),,,204,204
-.decrement(),,,210,210
-.take(),,,210,210
-.abort(),,,222,222
-process(),,,232,232
-my_func,,,233,233
-.push(),,,288,288|300
-.receive(),,,288,288
-q.peek(),,,294,294
-.read_all(),,,300,300
-counter.get_lock(),,,313,313
-.flush(),,,344,344
-.commit(),,,344,344
-pool_size,,,427,427
-.check(),,,444,444
-ProcessPool,,,450,450
-ExpiredError,,,458,458
-NONE_COMPLETED,,,583,583
-save_critical_data(),,,589,589
-flush_sync,,,649,649
-sync_entry(),,,692,692
-async_work(),,,692,692
-run_forever,,,765,765
 Pipes,A multiprocessing function that creates a two-way connection between two processes.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Pipe,289,244|248
 Values,A multiprocessing object that stores one shared value in memory that several processes can use.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value,289,235|1834|520|542
 Managers,A multiprocessing server process that holds shared objects and hands out proxies to them.,https://docs.python.org/3/library/multiprocessing.html#managers,289,155|603|761
