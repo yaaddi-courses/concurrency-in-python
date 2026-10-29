@@ -4,7 +4,7 @@
   "description": "Threading, multiprocessing, and asyncio — from the GIL to structured concurrency, start to finish.",
   "image": "cover.png",
   "file": "concurrency-in-python.zip",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "tags": [
     "python",
     "concurrency",
@@ -27,6 +27,11 @@
       "version": "1.1.0",
       "date": "2026-10-29",
       "notes": "Adds Learn more articles (38, each with a worked example) for the glossary terms; tapping a term now offers \"Read the full explanation\"."
+    },
+    {
+      "version": "1.1.1",
+      "date": "2026-10-29",
+      "notes": "Cards: fill-in-the-blank code fragments no longer use code formatting around the blank, so they are not mistaken for unknown terms."
     }
   ],
   "toc": [
