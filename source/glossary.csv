@@ -234,7 +234,7 @@ Array,A multiprocessing object that stores a shared fixed-size array of one nume
 FIRST_EXCEPTION,A wait option that returns as soon as any future finishes with an exception.,https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.wait,475,handling-results-as-they-finish#first-exception
 InvalidStateError,The asyncio exception raised when a Future or Task is used in a state where that is not allowed.,https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.InvalidStateError,458,pool-sizing-and-future-states#invalidstateerror
 CPUs,Central processing units: the processors that run a computer's programs.,,,concurrency-and-parallelism#cpu
-Future,An object that stands for a result that is not ready yet.,https://docs.python.org/3/library/asyncio-future.html,535,executors-and-futures#future
+Future,An object that stands for a result that is not ready yet.,https://docs.python.org/3/library/asyncio-future.html,394,executors-and-futures#future
 LAST_COMPLETED,"Not an asyncio wait option; the real ones are FIRST_COMPLETED, FIRST_EXCEPTION and ALL_COMPLETED.",https://docs.python.org/3/library/asyncio-task.html#asyncio.wait,583,gather-groups-and-cancellation#last-completed
 Client,The httpx object that sends HTTP requests and reuses connections.,https://www.python-httpx.org/async/,668,web-client-terms#client
 Session,"An object, as in the requests library, that keeps settings and connections across several HTTP requests.",https://requests.readthedocs.io/en/latest/user/advanced/#session-objects,668,web-client-terms#session
