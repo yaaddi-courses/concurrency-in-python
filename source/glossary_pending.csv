@@ -1,0 +1,56 @@
+term,definition,link,introduced_by_card_id,found_in
+.begin(),,,74,74
+.execute(),,,74,74
+.status(),,,81,81
+t.___(),,,82,82|94
+is____(),,,83,83
+.unlock(),,,148,148
+critical_work(),,,154,154|155
+.off(),,,190,190
+___(),,,198,198
+state_changed(),,,204,204
+condition.___(),,,204,204|613
+.decrement(),,,210,210
+.take(),,,210,210
+.abort(),,,222,222
+process(),,,232,232
+my_func,,,233,233
+p.___(),,,241,241
+.push(),,,288,288|300
+.receive(),,,288,288
+multiprocessing.___(),,,289,289|349|361
+q.peek(),,,294,294
+.read_all(),,,300,300
+counter.get_lock(),,,313,313
+.flush(),,,344,344
+.commit(),,,344,344
+process.___(),,,391,391
+pool_size,,,427,427
+os.___(),,,434,434
+.check(),,,444,444
+ProcessPool,,,450,450
+ExpiredError,,,458,458
+f.___(),,,463,463
+asyncio.___(),,,506,506|512|535|542|571|590|595|625|693
+asyncio.create____(),,,530,530
+asyncio.as____(),,,548,548
+my_task.___(),,,553,553
+asyncio.wait____(),,,566,566
+NONE_COMPLETED,,,583,583
+save_critical_data(),,,589,589
+asyncio.open____(),,,638,638
+asyncio.start____(),,,644,644
+writer.___(),,,649,649
+flush_sync,,,649,649
+asyncio.create_subprocess____(),,,663,663
+httpx.___(),,,668,668
+sync_entry(),,,692,692
+async_work(),,,692,692
+run_forever,,,765,765
+loop.add_signal_______(),,,766,766
+Pipes,A multiprocessing function that creates a two-way connection between two processes.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Pipe,289,248
+Values,A multiprocessing object that stores one shared value in memory that several processes can use.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value,289,235|1834|520|542
+Managers,A multiprocessing server process that holds shared objects and hands out proxies to them.,https://docs.python.org/3/library/multiprocessing.html#managers,289,155|603|761
+Futures,An object that stands for a result that is not ready yet.,https://docs.python.org/3/library/asyncio-future.html,535,19|127|397|438|441|454|470|474|1860|687|737|742
+Clients,The httpx object that sends HTTP requests and reuses connections.,https://www.python-httpx.org/async/,668,643|666
+Requests,A message a client sends to a server asking for a resource or action.,https://en.wikipedia.org/wiki/HTTP#Request_message,668,6|17|30|265|399|516|550|553|555|1873|599|603|665|669|670|1892|756

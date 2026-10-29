@@ -97,6 +97,15 @@ def main():
         with open(glossary_path, encoding="utf-8-sig") as f:
             glossary_text = f.read()
 
+    # "Learn more" articles (optional): source/articles/<slug>.md ship inside the zip as articles/<slug>.md.
+    articles_dir = os.path.join(source_dir, "articles")
+    articles = {}
+    if os.path.isdir(articles_dir):
+        for name in sorted(os.listdir(articles_dir)):
+            if name.endswith(".md"):
+                with open(os.path.join(articles_dir, name), encoding="utf-8-sig") as f:
+                    articles[name] = f.read()
+
     meta_rows = read_csv_text(meta_text)
     if not meta_rows or not (meta_rows[0].get("slug") or "").strip():
         print("source/meta.csv is missing a \"slug\" column/value.", file=sys.stderr)
@@ -133,11 +142,15 @@ def main():
         zf.writestr("cards.csv", cards_text)
         if glossary_text is not None:
             zf.writestr("glossary.csv", glossary_text)
+        for name, text in articles.items():
+            zf.writestr("articles/" + name, text)
         for filename, path in resolved.items():
             zf.write(path, filename)
 
     size_kb = round(os.path.getsize(out_path) / 1024)
     glossary_note = " + glossary.csv" if glossary_text is not None else ""
+    if articles:
+        glossary_note += f" + {len(articles)} article(s)"
     print(
         f"Wrote {out_path} ({size_kb} KB — meta/units/cards.csv{glossary_note} + {len(resolved)} media file(s))",
         file=sys.stderr,

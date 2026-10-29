@@ -1098,7 +1098,12 @@ def validate_zip(course_dir, meta, report):
                     "ship one (see flashcard-course-creator SKILL.md §2a)"
                 )
             else:
-                validate_glossary_rows(read_csv_text(glossary_text), report, card_ids)
+                zip_anchors = {}
+                for entry in zf.namelist():
+                    if entry.startswith("articles/") and entry.endswith(".md"):
+                        body = zf.read(entry).decode("utf-8-sig")
+                        zip_anchors[entry[len("articles/"):-3]] = set(ANCHOR_IN_ARTICLE.findall(body))
+                validate_glossary_rows(read_csv_text(glossary_text), report, card_ids, zip_anchors)
     except zipfile.BadZipFile:
         report.error(f'"{meta["file"]}" is not a valid zip file')
 
@@ -1125,15 +1130,54 @@ def validate_glossary(source_dir, report, cards=None):
     if not rows:
         report.error("source/glossary.csv exists but has no rows — add at least one term")
     card_ids = {c.get("id") for c in cards} if cards is not None else None
-    validate_glossary_rows(rows, report, card_ids)
+    validate_glossary_rows(
+        rows, report, card_ids, read_article_anchors(os.path.join(source_dir, "articles"))
+    )
 
 
-def validate_glossary_rows(rows, report, card_ids=None):
+ARTICLE_REF = re.compile(r"^[a-z0-9][a-z0-9-]*(#[a-z0-9][a-z0-9-]*)?$")
+ANCHOR_IN_ARTICLE = re.compile(r"\{#([a-z0-9-]+)\}")
+
+
+def read_article_anchors(articles_dir):
+    """slug -> set of {#anchor} names, for every source/articles/<slug>.md."""
+    anchors = {}
+    if articles_dir and os.path.isdir(articles_dir):
+        for name in sorted(os.listdir(articles_dir)):
+            if name.endswith(".md"):
+                with open(os.path.join(articles_dir, name), encoding="utf-8-sig") as f:
+                    anchors[name[:-3]] = set(ANCHOR_IN_ARTICLE.findall(f.read()))
+    return anchors
+
+
+def validate_article_ref(row_no, term, reference, anchors, report):
+    """A glossary row's optional `article` ("slug" or "slug#anchor") must name a real article and heading."""
+    if not reference:
+        return
+    if not ARTICLE_REF.match(reference):
+        report.error(
+            f'glossary.csv row {row_no} ("{term}"): article "{reference}" must look like "slug" or "slug#anchor" '
+            "(lowercase letters, digits and hyphens)"
+        )
+        return
+    if anchors is None:
+        return
+    slug, _, anchor = reference.partition("#")
+    if slug not in anchors:
+        report.error(f'glossary.csv row {row_no} ("{term}"): article "{slug}" has no source/articles/{slug}.md')
+    elif anchor and anchor not in anchors[slug]:
+        report.error(
+            f'glossary.csv row {row_no} ("{term}"): articles/{slug}.md has no heading with {{#{anchor}}}'
+        )
+
+
+def validate_glossary_rows(rows, report, card_ids=None, article_anchors=None):
     seen_terms = {}
     for i, row in enumerate(rows, start=1):
         term = (row.get("term") or "").strip()
         definition = (row.get("definition") or "").strip()
         link = (row.get("link") or "").strip()
+        validate_article_ref(i, term, (row.get("article") or "").strip(), article_anchors, report)
         # Which card actually teaches this term, in teaching order — powers
         # tools/check_key_term_usage.py's forward-reference check (does any
         # EARLIER card use the term before this one introduces it). No
