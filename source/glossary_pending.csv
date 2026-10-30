@@ -1,7 +1,7 @@
 term,definition,link,introduced_by_card_id,found_in
 Pipes,A multiprocessing function that creates a two-way connection between two processes.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Pipe,289,244|248
-Values,A multiprocessing object that stores one shared value in memory that several processes can use.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value,289,235|1834|520|542
+Values,A multiprocessing object that stores one shared value in memory that several processes can use.,https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value,289,227|231|235|1834|520|542
 Managers,A multiprocessing server process that holds shared objects and hands out proxies to them.,https://docs.python.org/3/library/multiprocessing.html#managers,289,155|603|761
 Futures,An object that stands for a result that is not ready yet.,https://docs.python.org/3/library/asyncio-future.html,535,19|127|397|438|441|454|470|474|1860|687|737|742
 Clients,The httpx object that sends HTTP requests and reuses connections.,https://www.python-httpx.org/async/,668,643|666
-Requests,A message a client sends to a server asking for a resource or action.,https://en.wikipedia.org/wiki/HTTP#Request_message,668,6|17|30|265|399|516|550|553|555|1873|599|603|665|669|670|1892|756
+Requests,A message a client sends to a server asking for a resource or action.,https://en.wikipedia.org/wiki/HTTP#Request_message,668,17|30|265|399|516|550|553|555|1873|599|603|665|669|670|1892|756
