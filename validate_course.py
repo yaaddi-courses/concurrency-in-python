@@ -9,8 +9,10 @@ practice cards are all one type or itself true_false, a course leaning on
 too few of the available card types (see KNOWN_TYPES), a course with too
 much typing overall, a missing or
 duplicate course id, an image (cover or card art) larger than
-MAX_IMAGE_DIMENSION, and a course with no narrated (media_card) cards at
-all — before you open a PR or import into the app.
+MAX_IMAGE_DIMENSION, a select_blank card with several "___" blanks whose
+options do not split on "/" into one part per blank, and a course with no
+narrated (media_card) cards at all — before you open a PR or import into
+the app.
 
 No dependencies beyond the standard library.
 
@@ -471,6 +473,9 @@ def _check_inline_code_markup(card, report):
             )
 
 
+# One select_blank blank: "___" or a longer run of underscores, as the app splits the prompt.
+BLANK_RE = re.compile(r"_{3,}")
+
 # "Listen: What does X do?" - a leftover authoring label, not a task (see validate_cards).
 STRAY_LISTEN_PREFIX_RE = re.compile(r"^\s*listen\s*[:,\-–—]", re.IGNORECASE)
 
@@ -493,6 +498,19 @@ def _check_importer_rules(c, ctype, cid, report):
                 )
     elif ctype == "select_blank" and "___" not in (c.get("prompt") or ""):
         report.error(f'card {cid}: select_blank prompt must contain a "___" blank to fill in')
+    elif ctype == "select_blank":
+        # The app (selectBlankCard.tsx) treats each run of 3+ underscores as one blank and, when there
+        # are several, fills them from the option split on "/", one part per blank; any other split
+        # puts the whole option in the first blank and leaves the rest empty (e.g. "I/O/CPU" for two).
+        blanks = len(BLANK_RE.findall(c.get("prompt") or ""))
+        for option in _split_options(c.get("options") or "") if blanks > 1 else []:
+            parts = option.split("/")
+            if len(parts) != blanks or not all(parts):
+                report.error(
+                    f'card {cid}: select_blank prompt has {blanks} blanks, so each option needs {blanks} '
+                    f'non-empty "/"-separated parts, one per blank - "{option}" has {len(parts)}; '
+                    'a part cannot contain "/" itself (reword it, or use one blank)'
+                )
 
 
 def validate_cards(units, cards, report, media_files=None):

@@ -1,0 +1,131 @@
+section,deck,pack,level,keywords,terms,kind,main_card_id
+Core Fundamentals & GIL,Concurrency Models Comparison,What does 'concurrency' mean in programming?,1,concurrency,concurrency,teach,1
+Core Fundamentals & GIL,Concurrency Models Comparison,What's the difference between concurrency and parallelism?,1,parallelism|Lock,parallelism|Lock,teach,8
+Core Fundamentals & GIL,Concurrency Models Comparison,"What's the core difference between threading, multiprocessin",1,event loop|Thread|Event,event loop|Thread|Event,teach,15
+Core Fundamentals & GIL,Workload Types (I/O-Bound vs. CPU-Bound),What does 'I/O-bound' mean?,1,I/O-bound,I/O-bound,teach,22
+Core Fundamentals & GIL,Workload Types (I/O-Bound vs. CPU-Bound),What does 'CPU-bound' mean?,1,CPU-bound,CPU-bound,teach,28
+Core Fundamentals & GIL,Global Interpreter Lock (GIL) Mechanics,What is the GIL (Global Interpreter Lock)?,1,GIL|mutex|reference counting|Protocol,GIL|mutex|reference counting|Protocol,teach,35
+Core Fundamentals & GIL,Global Interpreter Lock (GIL) Mechanics,Why does CPython use a GIL?,1,bytecode,bytecode,teach,41
+Core Fundamentals & GIL,GIL Impact on Workloads,Why does threading help I/O-bound programs?,1,Why does threading help I/O-bound programs?,,teach,47
+Core Fundamentals & GIL,GIL Impact on Workloads,What forces a GIL handoff between threads?,1,switch interval|setswitchinterval,switch interval|setswitchinterval,teach,53
+Core Fundamentals & GIL,Circumventing & Modern Evolution of the GIL,What gets true CPU parallelism in Python?,1,C extension|threading.Thread,C extension|threading.Thread,teach,59
+Core Fundamentals & GIL,Circumventing & Modern Evolution of the GIL,What is 'free-threaded' Python?,1,free-threaded Python,free-threaded Python,teach,65
+Low-Level Threading,Creating & Managing Threads,How do you create and start a thread?,1,How do you create and start a thread?,,teach,72
+Low-Level Threading,Creating & Managing Threads,How do you check if a thread runs?,1,How do you check if a thread runs?,,teach,79
+Low-Level Threading,Thread Execution Synchronization (join),What does calling `.join()` on a thread do?,1,What does calling `.join()` on a thread do?,,teach,85
+Low-Level Threading,Thread Execution Synchronization (join),What order to start and join threads?,1,"fan-out, fan-in","fan-out, fan-in",teach,91
+Low-Level Threading,Main vs. Worker vs. Daemon Threads,What's special about a daemon thread?,1,daemon thread,daemon thread,teach,97
+Low-Level Threading,Main vs. Worker vs. Daemon Threads,What is the 'main thread'?,1,main thread,main thread,teach,104
+Low-Level Threading,Thread Metadata & Identity,How do you get the current thread?,1,How do you get the current thread?,,teach,110
+Low-Level Threading,Thread Metadata & Identity,How many threads are currently alive?,1,How many threads are currently alive?,,teach,116
+Low-Level Threading,Thread Communication & Return Values,Why can't a thread just return a value?,1,Queue,Queue,teach,122
+Low-Level Threading,Thread Communication & Return Values,What happens on an uncaught thread exception?,1,threading.excepthook,threading.excepthook,teach,128
+Thread Synchronization & Safety,Race Conditions & Critical Sections,What is a race condition?,1,race condition|read-modify-write|livelock,race condition|read-modify-write|livelock,teach,134
+Thread Synchronization & Safety,Race Conditions & Critical Sections,What is a 'critical section' in concurrent code?,1,critical section,critical section,teach,140
+Thread Synchronization & Safety,Mutual Exclusion (threading.Lock),What does `threading.Lock()` give you?,1,threading.Lock|threading.Timer|threading.local|RLock|Semaphore|Barrier,threading.Lock|threading.Timer|threading.local|RLock|Semaphore|Barrier,teach,146
+Thread Synchronization & Safety,Mutual Exclusion (threading.Lock),Why use 'with lock:' over manual calls?,1,Why use 'with lock:' over manual calls?,,teach,152
+Thread Synchronization & Safety,Reentrant Locking (threading.RLock),What problem does RLock solve?,1,threading.RLock,threading.RLock,teach,158
+Thread Synchronization & Safety,Deadlocks & Lock Ordering,What is a deadlock?,1,deadlock,deadlock,teach,164
+Thread Synchronization & Safety,Deadlocks & Lock Ordering,How do you prevent lock-ordering deadlocks?,1,lock ordering,lock ordering,teach,170
+Thread Synchronization & Safety,Atomic Operations & Built-in Thread Safety,What does 'atomic' mean here?,1,atomic,atomic,teach,176
+Thread Synchronization & Safety,Atomic Operations & Built-in Thread Safety,Why is counter+=1 dangerous across threads?,1,Why is counter+=1 dangerous across threads?,,teach,182
+Advanced Thread Coordination,Event Signaling (threading.Event),What is a threading.Event used for?,1,threading.Event,threading.Event,teach,188
+Advanced Thread Coordination,Conditional Synchronization (threading.Condition),What problem does Condition solve?,1,threading.Condition|spurious wakeup,threading.Condition|spurious wakeup,teach,195
+Advanced Thread Coordination,Conditional Synchronization (threading.Condition),When should you call `notify()` instead of `notify_all()`?,1,producer-consumer pattern,producer-consumer pattern,teach,201
+Advanced Thread Coordination,Resource Throttling (threading.Semaphore),What does a threading.Semaphore let you control?,2,threading.Semaphore,threading.Semaphore,teach,208
+Advanced Thread Coordination,Resource Throttling (threading.Semaphore),What extra safety does BoundedSemaphore add?,2,What extra safety does BoundedSemaphore add?,,teach,214
+Advanced Thread Coordination,Delayed Execution (threading.Timer),What does threading.Timer do?,2,What does threading.Timer do?,,teach,220
+Advanced Thread Coordination,Thread-Local Storage (threading.local),What does `threading.local()` give each thread?,2,What does `threading.local()` give each thread?,,teach,226
+Multi-Processing Fundamentals,Process Creation & Execution,How do you create and start a process?,2,multiprocessing.Process,multiprocessing.Process,teach,232
+Multi-Processing Fundamentals,Process Creation & Execution,How do you wait for a process?,2,How do you wait for a process?,,teach,238
+Multi-Processing Fundamentals,Memory Isolation: Threads vs. Processes,How does thread memory differ from process memory?,2,IPC,IPC,teach,244
+Multi-Processing Fundamentals,Memory Isolation: Threads vs. Processes,What does 'copy-on-write' mean for forking?,2,copy-on-write|fork|spawn|forkserver,copy-on-write|fork|spawn|forkserver,teach,250
+Multi-Processing Fundamentals,"Process Start Methods (fork, spawn, forkserver)",What does the 'fork' start method do?,2,What does the 'fork' start method do?,,teach,256
+Multi-Processing Fundamentals,"Process Start Methods (fork, spawn, forkserver)",What changed in multiprocessing defaults on Linux?,2,What changed in multiprocessing defaults on Linux?,,teach,262
+Multi-Processing Fundamentals,Platform-Specific Process Behaviors,Why does 'spawn' need the __main__ guard?,2,__main__ guard,__main__ guard,teach,268
+Multi-Processing Fundamentals,Process Exit Codes & Error Handling,How do you check if a process succeeded?,2,exitcode,exitcode,teach,274
+Multi-Processing Fundamentals,Process Exit Codes & Error Handling,What happens on an uncaught child exception?,2,multiprocessing.Queue,multiprocessing.Queue,teach,280
+Inter-Process Communication,Inter-Process Queues (multiprocessing.Queue),What is multiprocessing.Queue for?,2,FIFO,FIFO,teach,286
+Inter-Process Communication,Inter-Process Queues (multiprocessing.Queue),What happens calling `.get()` on an empty Queue?,2,What happens calling `.get()` on an empty Queue?,,teach,292
+Inter-Process Communication,Inter-Process Pipes (multiprocessing.Pipe),What does `multiprocessing.Pipe()` give you?,2,multiprocessing.Pipe,multiprocessing.Pipe,teach,298
+Inter-Process Communication,Inter-Process Pipes (multiprocessing.Pipe),Duplex vs simplex mode for a Pipe?,2,duplex|simplex,duplex|simplex,teach,304
+Inter-Process Communication,Basic Shared Memory (Value & Array),What does multiprocessing.Value let you share between proces,2,multiprocessing.Value,multiprocessing.Value,teach,310
+Inter-Process Communication,Basic Shared Memory (Value & Array),What does multiprocessing.Array give you that Value doesn't?,2,multiprocessing.Array,multiprocessing.Array,teach,316
+Inter-Process Communication,Modern Shared Memory (multiprocessing.shared_memory),What does shared_memory offer over Value/Array?,2,shared_memory,shared_memory,teach,322
+Inter-Process Communication,Modern Shared Memory (multiprocessing.shared_memory),What's the well-known 'resource tracker' gotcha with shared_,2,resource tracker,resource tracker,teach,328
+Inter-Process Communication,Process Managers (multiprocessing.Manager),How does Manager share a dict or list?,2,multiprocessing.Manager|proxy,multiprocessing.Manager|proxy,teach,334
+Inter-Process Communication,Process Managers (multiprocessing.Manager),What's the nested-mutation gotcha in `manager.dict()`?,2,What's the nested-mutation gotcha in `manager.dict()`?,,teach,340
+Inter-Process Synchronization,Inter-Process Locking (multiprocessing.Lock),What does multiprocessing.Lock actually protect?,2,multiprocessing.Lock,multiprocessing.Lock,teach,346
+Inter-Process Synchronization,Inter-Process Locking (multiprocessing.Lock),What happens passing a Lock to a child?,2,What happens passing a Lock to a child?,,teach,352
+Inter-Process Synchronization,Reentrant Inter-Process Locking (multiprocessing.RLock),What problem does multiprocessing.RLock solve?,2,multiprocessing.RLock,multiprocessing.RLock,teach,358
+Inter-Process Synchronization,Inter-Process Events & Semaphores,What is multiprocessing.Event used for?,2,multiprocessing.Event,multiprocessing.Event,teach,364
+Inter-Process Synchronization,Inter-Process Events & Semaphores,What does multiprocessing.Semaphore let you throttle across ,2,multiprocessing.Semaphore,multiprocessing.Semaphore,teach,370
+Inter-Process Synchronization,Process Synchronization Barriers (multiprocessing.Barrier),What does multiprocessing.Barrier do?,2,multiprocessing.Barrier,multiprocessing.Barrier,teach,376
+Inter-Process Synchronization,Worker Process Teardown Patterns,What is a 'poison pill' for workers?,2,poison pill,poison pill,teach,382
+Inter-Process Synchronization,Worker Process Teardown Patterns,Graceful shutdown vs `process.terminate()`?,2,graceful shutdown|process.terminate,graceful shutdown|process.terminate,teach,388
+High-Level Task Pools,Executor Pool Selection,What does ThreadPoolExecutor add over raw threads?,2,ThreadPoolExecutor|Future object,ThreadPoolExecutor|Future object,teach,394
+High-Level Task Pools,Executor Pool Selection,What can ProcessPoolExecutor do that ThreadPoolExecutor can',3,ProcessPoolExecutor,ProcessPoolExecutor,teach,400
+High-Level Task Pools,Task Submission Mechanics (submit vs. map),What does `executor.submit()` do?,3,What does `executor.submit()` do?,,teach,406
+High-Level Task Pools,Task Submission Mechanics (submit vs. map),How does `map()` differ from a `submit()` loop?,3,executor.map,executor.map,teach,412
+High-Level Task Pools,Pool Context Management & Lifecycle,Why use 'with `ThreadPoolExecutor()`'?,3,Why use 'with `ThreadPoolExecutor()`'?,,teach,418
+High-Level Task Pools,Pool Sizing & Resource Management,What does the max_workers parameter control?,3,max_workers,max_workers,teach,424
+High-Level Task Pools,Pool Sizing & Resource Management,Why does max_workers differ CPU vs I/O?,3,Why does max_workers differ CPU vs I/O?,,teach,430
+High-Level Task Pools,Queue Backpressure in Executors,What happens submitting 10M tasks at once?,3,backpressure,backpressure,teach,436
+Deferred Tasks & Futures,Future Objects Core Lifecycle,What is a Future object?,3,What is a Future object?,,teach,442
+Deferred Tasks & Futures,Future Objects Core Lifecycle,What does `future.result()` do on exception?,3,What does `future.result()` do on exception?,,teach,448
+Deferred Tasks & Futures,Non-Blocking Future Checks & Timeouts,What happens if `result(timeout=5)` expires?,3,What happens if `result(timeout=5)` expires?,,teach,454
+Deferred Tasks & Futures,Future Completion Callbacks,What does `future.add_done_callback(func)` do?,3,add_done_callback,add_done_callback,teach,460
+Deferred Tasks & Futures,Handling Collections of Futures,What does `concurrent.futures.as_completed(futures)` give yo,3,as_completed,as_completed,teach,466
+Deferred Tasks & Futures,Handling Collections of Futures,How does `wait()` differ from `as_completed()`?,3,How does `wait()` differ from `as_completed()`?,,teach,472
+Deferred Tasks & Futures,Task Cancellation Mechanics,When does `future.cancel()` actually succeed?,3,When does `future.cancel()` actually succeed?,,teach,478
+Asyncio Core Mechanics,Async Syntax & Coroutines,What does 'async def' create?,3,coroutine|async def|asyncio.run|asyncio.sleep,coroutine|async def|asyncio.run|asyncio.sleep,teach,484
+Asyncio Core Mechanics,Async Syntax & Coroutines,What does 'await' actually do inside a coroutine?,3,await,await,teach,490
+Asyncio Core Mechanics,The Event Loop Paradigm,What is asyncio's cooperative multitasking?,3,cooperative multitasking,cooperative multitasking,teach,496
+Asyncio Core Mechanics,The Event Loop Paradigm,What does asyncio.run(`main()`) do?,3,What does asyncio.run(`main()`) do?,,teach,502
+Asyncio Core Mechanics,Yielding Control in Coroutines,`asyncio.sleep(1)` vs `time.sleep(1)` in a coroutine?,3,`asyncio.sleep(1)` vs `time.sleep(1)` in a coroutine?,,teach,508
+Asyncio Core Mechanics,Event Loop Starvation & Blocking,What happens with a long no-await CPU loop?,3,starvation,starvation,teach,514
+Asyncio Core Mechanics,Event Loop Starvation & Blocking,What causes event loop starvation?,3,event loop starvation,event loop starvation,teach,1919
+Asyncio Core Mechanics,Coroutines vs. Synchronous Functions,Regular function call vs async def call?,3,Regular function call vs async def call?,,teach,520
+Async Tasks & Scheduling,Task Instantiation (asyncio.create_task),`create_task(coro)` vs plain 'await coro'?,3,create_task,create_task,teach,526
+Async Tasks & Scheduling,Coroutines vs. Tasks vs. Futures in Asyncio,Coroutine vs Task vs Future?,3,Coroutine vs Task vs Future?,,teach,532
+Async Tasks & Scheduling,Coroutines vs. Tasks vs. Futures in Asyncio,What does asyncio.Task wrap?,3,asyncio.Task,asyncio.Task,teach,1915
+Async Tasks & Scheduling,Concurrent Task Gathering (asyncio.gather),"What does `asyncio.gather(coro1, coro2, coro3)` do?",3,asyncio.gather,asyncio.gather,teach,538
+Async Tasks & Scheduling,Out-of-Order Async Results (asyncio.as_completed),How does `asyncio.as_completed()` differ from `asyncio.gathe,3,How does `asyncio.as_completed()` differ from `asyncio.gather()`?,,teach,544
+Async Tasks & Scheduling,Async Task Cancellation Mechanics,What does `task.cancel()` actually do?,3,CancelledError,CancelledError,teach,550
+Structured Concurrency & Timeouts,Async Timeouts & Deadlines,What does 'async with `asyncio.timeout(5)`:' do (Python 3.11,3,asyncio.timeout,asyncio.timeout,teach,556
+Structured Concurrency & Timeouts,Async Timeouts & Deadlines,"What does `asyncio.wait_for(coro, timeout=5)` do?",3,asyncio.wait_for,asyncio.wait_for,teach,562
+Structured Concurrency & Timeouts,Structured Concurrency (asyncio.TaskGroup),What does TaskGroup guarantee over manual tracking?,3,TaskGroup,TaskGroup,teach,568
+Structured Concurrency & Timeouts,Exception Groups in Async Contexts,Why does TaskGroup raise an ExceptionGroup?,3,ExceptionGroup,ExceptionGroup,teach,574
+Structured Concurrency & Timeouts,Multi-Task Waiting Strategies,What does `asyncio.wait()` with FIRST_COMPLETED do?,3,asyncio.wait,asyncio.wait,teach,580
+Structured Concurrency & Timeouts,Shielding Async Tasks from Cancellation,What does `asyncio.shield(coro)` protect against?,4,asyncio.shield,asyncio.shield,teach,586
+Async Primitives & Data Structures,Async Mutual Exclusion (asyncio.Lock),Why does asyncio need its own Lock?,4,asyncio.Lock,asyncio.Lock,teach,592
+Async Primitives & Data Structures,Async Throttling (asyncio.Semaphore),What does `asyncio.Semaphore(5)` enforce?,4,asyncio.Semaphore,asyncio.Semaphore,teach,598
+Async Primitives & Data Structures,Async Signaling (Event & Condition),What does asyncio.Event let coroutines do?,4,asyncio.Event,asyncio.Event,teach,604
+Async Primitives & Data Structures,Async Signaling (Event & Condition),What does asyncio.Condition add on top of asyncio.Event?,4,asyncio.Condition,asyncio.Condition,teach,610
+Async Primitives & Data Structures,Async Queues (asyncio.Queue),What does asyncio.Queue provide coroutines?,4,asyncio.Queue,asyncio.Queue,teach,616
+Async Primitives & Data Structures,Async Queues (asyncio.Queue),Queue vs LifoQueue vs PriorityQueue?,4,LifoQueue|PriorityQueue,LifoQueue|PriorityQueue,teach,622
+Async Primitives & Data Structures,Sync Lock Errors in Async Code,What happens using threading.Lock in a coroutine?,4,What happens using threading.Lock in a coroutine?,,teach,628
+Asynchronous I/O & Networking,High-Level Async Network Streams,What does `open_connection()` give you?,4,StreamReader|StreamWriter,StreamReader|StreamWriter,teach,634
+Asynchronous I/O & Networking,High-Level Async Network Streams,What does `start_server()` set up?,4,What does `start_server()` set up?,,teach,640
+Asynchronous I/O & Networking,Async Stream Readers & Writers,`reader.read(100)` vs `reader.readline()`?,4,`reader.read(100)` vs `reader.readline()`?,,teach,646
+Asynchronous I/O & Networking,Transports & Protocols (Low-Level Async),How do Transports/Protocols relate to streams?,4,Transport,Transport,teach,652
+Asynchronous I/O & Networking,Async Subprocesses,What does `create_subprocess_exec()` do?,4,create_subprocess_exec,create_subprocess_exec,teach,659
+Asynchronous I/O & Networking,Asynchronous HTTP Clients,Why does 'requests' block the event loop?,4,Why does 'requests' block the event loop?,,teach,665
+Cross-Paradigm Integration,Offloading CPU Tasks from Async (run_in_executor),What does `run_in_executor()` do?,4,run_in_executor,run_in_executor,teach,671
+Cross-Paradigm Integration,Modern Thread Offloading (asyncio.to_thread),`to_thread()` vs `run_in_executor()`?,4,asyncio.to_thread,asyncio.to_thread,teach,677
+Cross-Paradigm Integration,Dedicated Event Loop Threads,Why run a dedicated event-loop thread?,4,run_coroutine_threadsafe,run_coroutine_threadsafe,teach,683
+Cross-Paradigm Integration,Sync-to-Async Bridge,Simplest way to call async from sync code?,4,Simplest way to call async from sync code?,,teach,689
+Cross-Paradigm Integration,Thread-Safe Async Scheduling,What problem does `run_coroutine_threadsafe()` solve?,4,What problem does `run_coroutine_threadsafe()` solve?,,teach,695
+System Architecture & Queue Patterns,Producer-Consumer Pattern Architecture,What problem does the producer-consumer pattern solve?,4,What problem does the producer-consumer pattern solve?,,teach,701
+System Architecture & Queue Patterns,Queue Implementation Selection,"How do queue.Queue, multiprocessing.Queue, and asyncio.Queue",4,"How do queue.Queue, multiprocessing.Queue, and asyncio.Queue differ?",,teach,707
+System Architecture & Queue Patterns,Queue Completion & Joining,What do `task_done()` and `join()` do together?,4,task_done,task_done,teach,713
+System Architecture & Queue Patterns,Bounded Queues & Backpressure,What happens calling `put()` at maxsize?,4,What happens calling `put()` at maxsize?,,teach,725
+"Profiling, Debugging & Concurrency Selection",Common Concurrency Bugs,Deadlock vs race-condition symptoms?,4,Deadlock vs race-condition symptoms?,,teach,731
+"Profiling, Debugging & Concurrency Selection",Common Concurrency Bugs,What are starvation and concurrency memory leaks?,4,What are starvation and concurrency memory leaks?,,teach,737
+"Profiling, Debugging & Concurrency Selection",Profiling Concurrent Code,Why is profiling concurrent code harder?,4,cProfile,cProfile,teach,743
+"Profiling, Debugging & Concurrency Selection",Asyncio Debug Mode,What does asyncio debug mode help catch?,4,asyncio debug mode,asyncio debug mode,teach,749
+"Profiling, Debugging & Concurrency Selection",Signal Handling & Graceful Teardown,Why intercept SIGINT/SIGTERM instead of default kill?,4,SIGINT|SIGTERM,SIGINT|SIGTERM,teach,756
+"Profiling, Debugging & Concurrency Selection",Signal Handling & Graceful Teardown,Why does asyncio need its own signal handling?,4,Why does asyncio need its own signal handling?,,teach,762
+"Profiling, Debugging & Concurrency Selection",Concurrency Selection Decision Tree,First question when choosing a concurrency model?,4,First question when choosing a concurrency model?,,teach,768
+Review,Recap: Key Terms,Recap pack 129,4,"switch interval|setswitchinterval|fan-out, fan-in|threading.excepthook|lock ordering|spurious wakeup|multiprocessing.Process|copy-on-write|__main__ guard|multiprocessing.Pipe|duplex|simplex|multiprocessing.Value|multiprocessing.Array|resource tracker|multiprocessing.Manager|multiprocessing.RLock|multiprocessing.Event|multiprocessing.Semaphore|multiprocessing.Barrier|graceful shutdown|process.terminate|add_done_callback|cooperative multitasking",,review,1923
+Review,Recap: Key Terms,Recap pack 130,4,cooperative multitasking|asyncio.wait_for|ExceptionGroup|asyncio.wait|asyncio.shield|asyncio.Semaphore|asyncio.Condition|LifoQueue|PriorityQueue|Transport|create_subprocess_exec|asyncio.to_thread|task_done|cProfile|asyncio debug mode|SIGINT|free-threaded Python|threading.Condition|executor.map|asyncio.Task,,review,1931
